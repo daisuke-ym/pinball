@@ -1,0 +1,8 @@
+{
+    "configuration": "LTO=enable,chip=84,clock=8internal,eesave=aenable,bod=disable,pinmapping=anew,millis=enabled,neopixelport=portb",
+    "board": "ATTinyCore:avr:attinyx4",
+    "sketch": "timer-controller.ino",
+    "port": "COM10",
+    "programmer": "arduinoasisp",
+    "output": "D://temp//Arduino//timer-controller//build"
+}
