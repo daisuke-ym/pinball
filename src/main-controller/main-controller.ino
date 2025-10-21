@@ -50,4 +50,6 @@ void loop() {
 
 		disp_lcd_can_message(rxId, rxLen, rxBuf);
 	}
+
+  serialInterface();
 }
