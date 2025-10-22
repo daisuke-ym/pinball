@@ -105,7 +105,7 @@ const unsigned long TIMERBOARD_TX = 0x120; // タイマー
 const unsigned long DTARGET0_RX   = 0x030; // 左ドロップターゲット
 const unsigned long DTARGET0_TX   = 0x130; // 左ドロップターゲット
 const unsigned long DTARGET1_RX   = 0x031; // 中ドロップターゲット
-const unsigned long DTARGET1_TX   = 0x132; // 中ドロップターゲット
+const unsigned long DTARGET1_TX   = 0x131; // 中ドロップターゲット
 const unsigned long DTARGET2_RX   = 0x032; // 右ドロップターゲット
 const unsigned long DTARGET2_TX   = 0x132; // 右ドロップターゲット
 const unsigned long JUMPER_RX     = 0x040; // ジャンパー
@@ -145,8 +145,8 @@ const byte TIMER_STAGE_NUM = 0x40; // ステージ番号送信
 // ドロップターゲット
 const byte DTARGET_TELEMETRY = 0x00; // 待機中
 const byte DTARGET_HIT       = 0x01; // ボールが当たった
-const byte DTARGET_UP        = 0x02; // ターゲットが上がっている
-const byte DTARGET_DOWN      = 0x04; // ターゲットが下がっている
+const byte DTARGET_UP        = 0x10; // ターゲットが上がっている・上げる
+const byte DTARGET_DOWN      = 0x20; // ターゲットが下がっている・下げる
 // ジャンパー
 const byte JUMPER_TELEMETRY = 0x00; // 待機中
 const byte JUMPER_HIT       = 0x01; // ボールが当たった（打ち上げた）

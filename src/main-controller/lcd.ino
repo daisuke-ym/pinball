@@ -51,6 +51,66 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
           break;
       }
       break;
+    case DTARGET0_TX: // 左ドロップターゲット
+      LCD.setCursor(6, 3);
+      switch (rxBuf[0]) {
+        case DTARGET_TELEMETRY:
+          LCD.print("-");
+          break;
+        case DTARGET_HIT:
+          LCD.print("H");
+          break;
+        case DTARGET_UP:
+          LCD.print("U");
+          break;
+        case DTARGET_DOWN:
+          LCD.print("_");
+          break;
+        default:
+          LCD.print("?");
+          break;
+      }
+      break;
+    case DTARGET1_TX: // 中ドロップターゲット
+      LCD.setCursor(7, 3);
+      switch (rxBuf[0]) {
+        case DTARGET_TELEMETRY:
+          LCD.print("-");
+          break;
+        case DTARGET_HIT:
+          LCD.print("H");
+          break;
+        case DTARGET_UP:
+          LCD.print("U");
+          break;
+        case DTARGET_DOWN:
+          LCD.print("_");
+          break;
+        default:
+          LCD.print("?");
+          break;
+      }
+      break;
+    case DTARGET2_TX: // 右ドロップターゲット
+      LCD.setCursor(8, 3);
+      switch (rxBuf[0]) {
+        case DTARGET_TELEMETRY:
+          LCD.print("-");
+          break;
+        case DTARGET_HIT:
+          LCD.print("H");
+          break;
+        case DTARGET_UP:
+          LCD.print("U");
+          break;
+        case DTARGET_DOWN:
+          LCD.print("_");
+          break;
+        default:
+          LCD.print("?");
+          break;
+      }
+      break;
     default:
       // nop
       break;
