@@ -167,8 +167,9 @@ const byte SLING_HIT       = 0x01; // ボールが当たった
 const byte STARGET_TELEMETRY = 0x00; // 待機中
 const byte STARGET_HIT       = 0x01; // ボールが当たった
 // 得点板
-const byte SCOREBOARD_SCORE = 0x00; // 得点表示
-const byte SCOREBOARD_CLEAR = 0x01; // 得点クリア
+const byte SCOREBOARD_TELEMETRY = 0x00; // 待機中
+const byte SCOREBOARD_SCORE     = 0x10; // 得点表示
+const byte SCOREBOARD_CLEAR     = 0x20; // 得点クリア
 // 30連LEDコントローラ
 const byte LED30_PAT1 = 0x00; // パターン1
 const byte LED30_PAT2 = 0x01; // パターン2
