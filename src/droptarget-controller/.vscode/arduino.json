@@ -1,0 +1,8 @@
+{
+    "configuration": "LTO=enable,TimerClockSource=default,chip=861,clock=8internal,pinmapping=new,eesave=aenable,bod=disable,millis=enabled,neopixelport=portb",
+    "board": "ATTinyCore:avr:attinyx61",
+    "port": "COM10",
+    "programmer": "arduinoasisp",
+    "sketch": "droptarget-controller.ino",
+    "output": "D://temp//Arduino//droptarget-controller"
+}
