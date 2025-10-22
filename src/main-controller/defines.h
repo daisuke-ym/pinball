@@ -139,9 +139,8 @@ const byte EXTRABALL_SHOOT     = 0x01; // エクストラボール打ち出し�
 const byte TIMER_TELEMETRY = 0x00; // 待機中
 const byte TIMER_COUNTDOWN = 0x01; // カウントダウン中
 const byte TIMER_TIMEUP    = 0x02; // タイムアップ
-const byte TIMER_SET       = 0x10; // 時間設定＆スタート
-const byte TIMER_STOP      = 0x20; // カウントダウン停止
-const byte TIMER_STAGE_NUM = 0x40; // ステージ番号送信
+const byte TIMER_STOP      = 0x04; // カウントダウン停止
+const byte TIMER_STAGE_NUM = 0x08; // ステージ番号送信
 // ドロップターゲット
 const byte DTARGET_TELEMETRY = 0x00; // 待機中
 const byte DTARGET_HIT       = 0x01; // ボールが当たった
