@@ -31,4 +31,28 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
     Serial.print(msg);
   }
 	Serial.println();
+
+  // 各アイテムごとのステータス表示
+  switch (rxId) {
+    case TIMERBOARD_TX: // タイマー
+      LCD.setCursor(19, 1);
+      switch (rxBuf[0]) {
+        case TIMER_TELEMETRY:
+          LCD.print("-");
+          break;
+        case TIMER_COUNTDOWN:
+          LCD.print("C");
+          break;
+        case TIMER_TIMEUP:
+          LCD.print("U");
+          break;
+        default:
+          LCD.print("?");
+          break;
+      }
+      break;
+    default:
+      // nop
+      break;
+  }
 }
