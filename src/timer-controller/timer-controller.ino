@@ -163,7 +163,7 @@ void loop() {
   static int hue = 0; // LEDの色相
   static int blank = NUMPIXELS - 1;
   static unsigned long can_update = 0;
-  const unsigned long can_update_period = 1000; // ミリ秒
+  const unsigned long can_update_period = 5000; // テレメトリー送信間隔（ミリ秒）
 
   if (!digitalRead(CAN0_INT)) {
     // メッセージ受信
