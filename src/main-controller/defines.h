@@ -148,9 +148,10 @@ const byte DTARGET_HIT       = 0x01; // ボールが当たった
 const byte DTARGET_UP        = 0x10; // ターゲットが上がっている・上げる
 const byte DTARGET_DOWN      = 0x20; // ターゲットが下がっている・下げる
 // ジャンパー
-const byte JUMPER_TELEMETRY = 0x00; // 待機中
-const byte JUMPER_HIT       = 0x01; // ボールが当たった（打ち上げた）
-const byte JUMPER_BALL_DOWN = 0x02; // ボールが下に落ちた
+const byte JUMPER_TELEMETRY  = 0x00; // 待機中
+const byte JUMPER_BALL_SENSE = 0x01; // ボールを感知した
+const byte JUMPER_BALL_SHOOT = 0x02; // ボールを打ち上げた
+const byte JUMPER_BALL_DROP  = 0x04; // ボールが落ちた
 // ボールセパレータ
 const byte BALLSEP_TELEMETRY = 0x00; // 待機中
 const byte BALLSEP_HIT       = 0x01; // ボールが当たった

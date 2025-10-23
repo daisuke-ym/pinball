@@ -111,6 +111,26 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
           break;
       }
       break;
+    case JUMPER_TX: // ジャンパー
+      LCD.setCursor(19, 3);
+      switch (rxBuf[0]) {
+        case JUMPER_TELEMETRY:
+          LCD.print("-");
+          break;
+        case JUMPER_BALL_SENSE:
+          LCD.print("S");
+          break;
+        case JUMPER_BALL_SHOOT:
+          LCD.print("H");
+          break;
+        case JUMPER_BALL_DROP:
+          LCD.print("D");
+          break;
+        default:
+          LCD.print("?");
+          break;
+      }
+      break;
     default:
       // nop
       break;
