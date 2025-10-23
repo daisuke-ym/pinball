@@ -25,6 +25,15 @@ unsigned long rxID;
 unsigned char len = 0;
 unsigned char rxBuf[8];
 byte data[4];
+// CANのフィルタ設定
+#define MASK0   0x7FF // 全ビットマスクしているので、Filterで指定したIDのみ受信する
+#define Filter0 0x000 // 受信したいCANIDを設定する（今回は使用しない）
+#define Filter1 0x000
+#define MASK1   0x7FF
+#define Filter2 0x000
+#define Filter3 0x000
+#define Filter4 0x000
+#define Filter5 0x000
 
 const byte SENSOR1 = 0;
 const byte SENSOR2 = 1;
@@ -114,6 +123,17 @@ void setup() {
     }
   }
 
+  // ジャンパーは送信しかしないので、受信フィルターは設定しない
+  /*
+  CAN0.init_Mask(0, 0, MASK0);
+  CAN0.init_Mask(1, 0, MASK1);
+  CAN0.init_Filt(0, 0, CANID);
+  CAN0.init_Filt(1, 0, Filter1);
+  CAN0.init_Filt(2, 0, Filter2); 
+  CAN0.init_Filt(3, 0, Filter3);
+  CAN0.init_Filt(4, 0, Filter4);
+  CAN0.init_Filt(5, 0, Filter5);
+  */
   CAN0.setMode(MCP_NORMAL); // Change to normal mode to allow messages to be transmitted
   delay(random(1000));
   data[0] = CANID;
@@ -128,6 +148,8 @@ void loop() {
   const unsigned long led_update_period = 74525; // マイクロ秒
   static int hue = 0; // LEDの色相
   static int blank = 0;
+  static unsigned long can_update = 0;
+  const unsigned long can_update_period = 5000; // テレメトリー送信間隔（ミリ秒）
 
   // センサ1検知時
   if (digitalRead(SENSOR1) == LOW && state == 0) {
@@ -209,6 +231,19 @@ void loop() {
       }
       led_update = micros();
     }
+  }
+
+  // テレメトリ送信
+  if ((millis() - can_update) > can_update_period) {
+    can_update = millis();
+    if (state == 1) {
+      data[0] = JUMPER_BALL_SHOOT;
+    }
+    else {
+      data[0] = JUMPER_BALL_DROP;
+    }
+    data[1] = millis() / 1000 & 0xFF;
+    CAN0.sendMsgBuf(MCANID, 0, 2, data);
   }
 }
 
