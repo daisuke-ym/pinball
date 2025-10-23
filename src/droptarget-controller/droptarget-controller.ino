@@ -29,6 +29,15 @@ unsigned long MCANID = 0; // 自分のCANID（送信用）
 unsigned long rxID;
 unsigned char len = 0;
 unsigned char rxBuf[8];
+// CANのフィルタ設定
+#define MASK0   0x7FF // 全ビットマスクしているので、Filter0で指定したIDのみ受信する
+#define Filter0 0x030 // 受信したいCANIDを設定する
+#define Filter1 0x000
+#define MASK1   0x7FF
+#define Filter2 0x000
+#define Filter3 0x000
+#define Filter4 0x000
+#define Filter5 0x000
 
 const int SENSOR1 = 0;
 const int SENSOR2 = 1;
@@ -112,7 +121,7 @@ void setup() {
   MCANID = CANID + 0x100;
 
   // Initialize MCP2515 running at 16MHz with a baudrate of 500kb/s and the masks and filters disabled.
-  if (CAN0.begin(MCP_ANY, CAN_500KBPS, MCP_16MHZ) == CAN_OK) {
+  if (CAN0.begin(MCP_STD, CAN_500KBPS, MCP_16MHZ) == CAN_OK) {
     //Serial.println("MCP2515 Initialized Successfully!");
     data[0] = ~ShiftData;
   }
@@ -120,6 +129,15 @@ void setup() {
     //Serial.println("Error Initializing MCP2515...");
   }
 
+  // there are 2 mask in mcp2515, you need to set both of them
+  CAN0.init_Mask(0, 0, MASK0);
+  CAN0.init_Mask(1, 0, MASK1);
+  CAN0.init_Filt(0, 0, CANID); // 自身のCANIDだけ受信する
+  CAN0.init_Filt(1, 0, Filter1);
+  CAN0.init_Filt(2, 0, Filter2); 
+  CAN0.init_Filt(3, 0, Filter3);
+  CAN0.init_Filt(4, 0, Filter4);
+  CAN0.init_Filt(5, 0, Filter5);
   CAN0.setMode(MCP_NORMAL);   // Change to normal mode to allow messages to be transmitted
   delay(100);
   data[0] = CANID;
