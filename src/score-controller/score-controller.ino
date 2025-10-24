@@ -11,6 +11,7 @@
 #include <math.h>
 #include <mcp_can.h>
 #include <SPI.h>
+#include <EEPROM.h>
 
 MCP_CAN CAN0(3);
 #define CAN0_INT 7
@@ -53,9 +54,12 @@ long SCORE = 0;
 long TARGET = 0;
 long HIGHSCORE = 0;
 
+byte MEMPTR = 0; // ハイスコアを保存するEEPROMの位置（先頭）
+
 // 受信コマンド
 const byte SCOREBOARD_SCORE = 0x10; // 得点加算
 const byte SCOREBOARD_CLEAR = 0x20; // 得点クリア
+const byte SCOREBOARD_CLEAR_HIGHSCORE = 0x40; // ハイスコアクリア
 
 // 送信コマンド
 const byte SCOREBOARD_TELEMETRY = 0x00; // 待機中
@@ -190,6 +194,12 @@ void setup() {
   digitalWrite(OE, LOW);
   analogWrite(OE, 40);
 
+  // EEPROMからハイスコアを読み込む
+  HIGHSCORE = EEPROM.read(MEMPTR) +
+              (EEPROM.read(MEMPTR + 1) << 8) +
+              (EEPROM.read(MEMPTR + 2) << 16) +
+              (EEPROM.read(MEMPTR + 3) << 24);
+
   /*
   demo()を入れるとマイコンのメモリ容量オーバーになってしまうのでコメントアウトしてある
   if (digitalRead(SW1) == LOW) {
@@ -221,9 +231,21 @@ void loop() {
     if (rxID == CANID && rxBuf[0] == SCOREBOARD_CLEAR) {
       if (SCORE > HIGHSCORE) {
         HIGHSCORE = SCORE;
+        EEPROM.write(MEMPTR, (byte)(HIGHSCORE & 0xFF));
+        EEPROM.write(MEMPTR + 1, (byte)((HIGHSCORE >> 8) & 0xFF));
+        EEPROM.write(MEMPTR + 2, (byte)((HIGHSCORE >> 16) & 0xFF));
+        EEPROM.write(MEMPTR + 3, (byte)((HIGHSCORE >> 24) & 0xFF));
       }
       SCORE = 0;
       TARGET = 0;
+    }
+    // SCOREBOARD_CLEAR_HIGHSCORE コマンド（ハイスコアクリア）を受け取った時の処理
+    if (rxID == CANID && rxBuf[0] == SCOREBOARD_CLEAR_HIGHSCORE) {
+      HIGHSCORE = 0;
+      EEPROM.write(MEMPTR, 0);
+      EEPROM.write(MEMPTR + 1, 0);
+      EEPROM.write(MEMPTR + 2, 0);
+      EEPROM.write(MEMPTR + 3, 0);
     }
   }
 
