@@ -14,12 +14,64 @@ unsigned char rxLen = 0;
 unsigned char rxBuf[8];
 byte data[3] = {0x00, 0x00, 0x00};
 
+// LCD用カスタム文字
+byte customChar0[] = { // 短いマイナス
+  0b00000,
+  0b00000,
+  0b00000,
+  0b01110,
+  0b00000,
+  0b00000,
+  0b00000,
+  0b00000
+};
+byte customChar1[] = { // 短いバックスラッシュ
+  0b00000,
+  0b00000,
+  0b01000,
+  0b00100,
+  0b00010,
+  0b00000,
+  0b00000,
+  0b00000
+};
+byte customChar2[] = { // 短い縦棒
+  0b00000,
+  0b00000,
+  0b00100,
+  0b00100,
+  0b00100,
+  0b00000,
+  0b00000,
+  0b00000
+};
+byte customChar3[] = { // 短いスラッシュ
+  0b00000,
+  0b00000,
+  0b00010,
+  0b00100,
+  0b01000,
+  0b00000,
+  0b00000,
+  0b00000
+};
+
+// テレメトリの進捗表示用文字
+byte progressChar[] = {
+  0, 1, 2, 3
+};
+byte progressLen = sizeof(progressChar) / sizeof(byte);
+
 // ----------------------------------------------------------------------
 void setup() {
 	// Serial初期化
 	Serial.begin(115200);
 	// LCD初期化
 	LCD.begin(20, 4);
+  LCD.createChar(0, customChar0);
+  LCD.createChar(1, customChar1);
+  LCD.createChar(2, customChar2);
+  LCD.createChar(3, customChar3);
 	// CAN初期化
   if (CAN0.begin(MCP_ANY, CAN_500KBPS, MCP_16MHZ) == CAN_OK) {
     Serial.println("MCP2515 Initialized Successfully!");
