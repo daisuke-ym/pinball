@@ -59,7 +59,7 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
       }
       break;
     case DTARGET0_TX: // 左ドロップターゲット
-      LCD.setCursor(6, 3);
+      LCD.setCursor(8, 3);
       switch (rxBuf[0]) {
         case DTARGET_TELEMETRY:
           LCD.print("-");
@@ -99,7 +99,7 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
       }
       break;
     case DTARGET2_TX: // 右ドロップターゲット
-      LCD.setCursor(8, 3);
+      LCD.setCursor(6, 3);
       switch (rxBuf[0]) {
         case DTARGET_TELEMETRY:
           LCD.print("-");
@@ -154,7 +154,7 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
       }
       break;
     case SLING0_TX: // 左スリングショット
-      LCD.setCursor(10, 3);
+      LCD.setCursor(11, 3);
       switch (rxBuf[0]) {
         case SLING_TELEMETRY:
           LCD.write(progressChar[slingshot0ProgressIndex]);
@@ -169,7 +169,7 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
       }
       break;
     case SLING1_TX: // 右スリングショット
-      LCD.setCursor(11, 3);
+      LCD.setCursor(10, 3);
       switch (rxBuf[0]) {
         case SLING_TELEMETRY:
           LCD.write(progressChar[slingshot1ProgressIndex]);
