@@ -1,0 +1,8 @@
+{
+    "sketch": "standuptarget-controller.ino",
+    "output": "c://temp//arduino//standuptarget-controller-2023//build",
+    "configuration": "LTO=enable,TimerClockSource=default,chip=861,clock=8internal,pinmapping=new,eesave=aenable,bod=disable,millis=enabled,neopixelport=portb",
+    "board": "ATTinyCore:avr:attinyx61",
+    "programmer": "arduinoasisp",
+    "port": "COM10"
+}
