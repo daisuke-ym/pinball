@@ -131,6 +131,20 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
           break;
       }
       break;
+    case STARGET_TX: // スタンダップターゲット
+      LCD.setCursor(5, 3);
+      switch (rxBuf[0]) {
+        case STARGET_TELEMETRY:
+          LCD.print("-");
+          break;
+        case STARGET_HIT:
+          LCD.print(rxBuf[1]);
+          break;
+        default:
+          LCD.print("?");
+          break;
+      }
+      break;
     default:
       // nop
       break;
