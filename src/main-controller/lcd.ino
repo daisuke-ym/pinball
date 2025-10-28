@@ -15,6 +15,9 @@ void disp_lcd_header() {
 void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
   char msg[20];
   static uint8_t timerProgressIndex = 0;
+  static uint8_t dtarget0ProgressIndex = 0;
+  static uint8_t dtarget1ProgressIndex = 0;
+  static uint8_t dtarget2ProgressIndex = 0;
   static uint8_t stargetProgressIndex = 0;
   static uint8_t slingshot0ProgressIndex = 0;
   static uint8_t slingshot1ProgressIndex = 0;
@@ -66,7 +69,8 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
       LCD.setCursor(8, 3);
       switch (rxBuf[0]) {
         case DTARGET_TELEMETRY:
-          LCD.print("-");
+          LCD.write(progressChar[dtarget0ProgressIndex]);
+          dtarget0ProgressIndex = (dtarget0ProgressIndex + 1) % progressLen;
           break;
         case DTARGET_HIT:
           LCD.print("H");
@@ -75,7 +79,7 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
           LCD.print("U");
           break;
         case DTARGET_DOWN:
-          LCD.print("_");
+          LCD.print("D");
           break;
         default:
           LCD.print("?");
@@ -86,7 +90,8 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
       LCD.setCursor(7, 3);
       switch (rxBuf[0]) {
         case DTARGET_TELEMETRY:
-          LCD.print("-");
+          LCD.write(progressChar[dtarget1ProgressIndex]);
+          dtarget1ProgressIndex = (dtarget1ProgressIndex + 1) % progressLen;
           break;
         case DTARGET_HIT:
           LCD.print("H");
@@ -95,7 +100,7 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
           LCD.print("U");
           break;
         case DTARGET_DOWN:
-          LCD.print("_");
+          LCD.print("D");
           break;
         default:
           LCD.print("?");
@@ -106,7 +111,8 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
       LCD.setCursor(6, 3);
       switch (rxBuf[0]) {
         case DTARGET_TELEMETRY:
-          LCD.print("-");
+          LCD.write(progressChar[dtarget2ProgressIndex]);
+          dtarget2ProgressIndex = (dtarget2ProgressIndex + 1) % progressLen;
           break;
         case DTARGET_HIT:
           LCD.print("H");
@@ -115,7 +121,7 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
           LCD.print("U");
           break;
         case DTARGET_DOWN:
-          LCD.print("_");
+          LCD.print("D");
           break;
         default:
           LCD.print("?");
