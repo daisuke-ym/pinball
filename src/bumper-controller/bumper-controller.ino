@@ -46,7 +46,7 @@ const byte SAT = 90; // LEDの彩度
 
 // 送信コマンド
 const byte BUMPER_TELEMETRY = 0x00; // 待機中
-const byte BUMPER_HIT       = 0x10; // センサ検知通知
+const byte BUMPER_HIT       = 0x01; // センサ検知通知
 
 // ----------------------------------------------------------------------
 byte ShiftIn(int QHPin, int clockPin, int loadPin) {
