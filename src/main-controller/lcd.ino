@@ -25,6 +25,8 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
   static uint8_t bumper1ProgressIndex = 0;
   static uint8_t bumper2ProgressIndex = 0;
   static uint8_t bumper3ProgressIndex = 0;
+  static uint8_t ballsepProgressIndex = 0;
+  static uint8_t ballthruProgressIndex = 0;
 
   // Print CAN ID
   LCD.setCursor(0, 1);
@@ -253,5 +255,34 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
           break;
       }
       break;
+    case BALLSEP_TX: // ボールセパレータ
+      LCD.setCursor(13, 3);
+      switch (rxBuf[0]) {
+        case BALLSEP_TELEMETRY:
+          LCD.write(progressChar[ballsepProgressIndex]);
+          ballsepProgressIndex = (ballsepProgressIndex + 1) % progressLen;
+          break;
+        case BALLSEP_HIT:
+          LCD.print("H");
+          break;
+        default:
+          LCD.print("?");
+          break;
+      }
+      break;
+    case BALLTHRU_TX: // ボールスルー
+      LCD.setCursor(16, 3);
+      switch (rxBuf[0]) {
+        case BALLTHRU_TELEMETRY:
+          LCD.write(progressChar[ballthruProgressIndex]);
+          ballthruProgressIndex = (ballthruProgressIndex + 1) % progressLen;
+          break;
+        case BALLTHRU_HIT:
+          LCD.print("H");
+          break;
+        default:
+          LCD.print("?");
+          break;
+      }
   }
 }
