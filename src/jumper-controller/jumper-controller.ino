@@ -236,12 +236,7 @@ void loop() {
   // テレメトリ送信
   if ((millis() - can_update) > can_update_period) {
     can_update = millis();
-    if (state == 1) {
-      data[0] = JUMPER_BALL_SHOOT;
-    }
-    else {
-      data[0] = JUMPER_BALL_DROP;
-    }
+    data[0] = JUMPER_TELEMETRY;
     data[1] = millis() / 1000 & 0xFF;
     CAN0.sendMsgBuf(MCANID, 0, 2, data);
   }
