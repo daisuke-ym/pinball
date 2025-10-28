@@ -18,6 +18,10 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
   static uint8_t stargetProgressIndex = 0;
   static uint8_t slingshot0ProgressIndex = 0;
   static uint8_t slingshot1ProgressIndex = 0;
+  static uint8_t bumper0ProgressIndex = 0;
+  static uint8_t bumper1ProgressIndex = 0;
+  static uint8_t bumper2ProgressIndex = 0;
+  static uint8_t bumper3ProgressIndex = 0;
 
   // Print CAN ID
   LCD.setCursor(0, 1);
@@ -176,6 +180,66 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
           slingshot1ProgressIndex = (slingshot1ProgressIndex + 1) % progressLen;
           break;
         case SLING_HIT:
+          LCD.print("H");
+          break;
+        default:
+          LCD.print("?");
+          break;
+      }
+      break;
+    case BUMPER0_TX: // 左バンパー
+      LCD.setCursor(2, 3);
+      switch (rxBuf[0]) {
+        case BUMPER_TELEMETRY:
+          LCD.write(progressChar[bumper0ProgressIndex]);
+          bumper0ProgressIndex = (bumper0ProgressIndex + 1) % progressLen;
+          break;
+        case BUMPER_HIT:
+          LCD.print("H");
+          break;
+        default:
+          LCD.print("?");
+          break;
+      }
+      break;
+    case BUMPER1_TX: // 中バンパー
+      LCD.setCursor(1, 3);
+      switch (rxBuf[0]) {
+        case BUMPER_TELEMETRY:
+          LCD.write(progressChar[bumper1ProgressIndex]);
+          bumper1ProgressIndex = (bumper1ProgressIndex + 1) % progressLen;
+          break;
+        case BUMPER_HIT:
+          LCD.print("H");
+          break;
+        default:
+          LCD.print("?");
+          break;
+      }
+      break;
+    case BUMPER2_TX: // 右バンパー
+      LCD.setCursor(0, 3);
+      switch (rxBuf[0]) {
+        case BUMPER_TELEMETRY:
+          LCD.write(progressChar[bumper2ProgressIndex]);
+          bumper2ProgressIndex = (bumper2ProgressIndex + 1) % progressLen;
+          break;
+        case BUMPER_HIT:
+          LCD.print("H");
+          break;
+        default:
+          LCD.print("?");
+          break;
+      }
+      break;
+    case BUMPER3_TX: // 上バンパー
+      LCD.setCursor(3, 3);
+      switch (rxBuf[0]) {
+        case BUMPER_TELEMETRY:
+          LCD.write(progressChar[bumper3ProgressIndex]);
+          bumper3ProgressIndex = (bumper3ProgressIndex + 1) % progressLen;
+          break;
+        case BUMPER_HIT:
           LCD.print("H");
           break;
         default:
