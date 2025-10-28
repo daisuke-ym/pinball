@@ -31,7 +31,7 @@ unsigned char len = 0;
 unsigned char rxBuf[8];
 // CANのフィルタ設定
 #define MASK0   0x7FF // 全ビットマスクしているので、Filter0で指定したIDのみ受信する
-#define Filter0 0x030 // 受信したいCANIDを設定する
+#define Filter0 0x000 // 受信したいCANIDを設定する
 #define Filter1 0x000
 #define MASK1   0x7FF
 #define Filter2 0x000
@@ -139,7 +139,8 @@ void setup() {
   CAN0.init_Filt(4, 0, Filter4);
   CAN0.init_Filt(5, 0, Filter5);
   CAN0.setMode(MCP_NORMAL);   // Change to normal mode to allow messages to be transmitted
-  delay(100);
+
+  delay(random(1000));
   data[0] = CANID;
   data[1] = DTARGET_TELEMETRY;
   CAN0.sendMsgBuf(MCANID, 0, 2, data);
@@ -180,6 +181,10 @@ void loop() {
       CAN0.sendMsgBuf(MCANID, 0, 1, data);
       // ターゲット下げ
       SV.write(SV_DOWN);
+      delay(100);
+      // ターゲットを下げた旨を送信
+      data[0] = DTARGET_DOWN;
+      CAN0.sendMsgBuf(MCANID, 0, 1, data);
       // デッドタイム
       delay(DEADTIME);
     }
@@ -192,33 +197,40 @@ void loop() {
     if (rxID == CANID && rxBuf[0] == DTARGET_UP) {
       state = 1;
       SV.write(SV_UP);
+      // ターゲットを上げた旨を送信
+      data[0] = DTARGET_UP;
+      CAN0.sendMsgBuf(MCANID, 0, 1, data);
     }
     // コマンド DTARGET_DOWN を受け取った時の処理
     if (rxID == CANID && rxBuf[0] == DTARGET_DOWN) {
       state = 0;
       SV.write(SV_DOWN);
+      // ターゲットを下げた旨を送信
+      data[0] = DTARGET_DOWN;
+      CAN0.sendMsgBuf(MCANID, 0, 1, data);
     }
   }
 
   if (digitalRead(SENSOR2) == LOW) {
     state = 0;
     SV.write(SV_DOWN);
+    // ターゲットを下げた旨を送信
+    data[0] = DTARGET_DOWN;
+    CAN0.sendMsgBuf(MCANID, 0, 1, data);
   }
   
   if (digitalRead(SENSOR3) == LOW) {
     state = 1;
     SV.write(SV_UP);
+    // ターゲットを上げた旨を送信
+    data[0] = DTARGET_UP;
+    CAN0.sendMsgBuf(MCANID, 0, 1, data);
   }
 
   // テレメトリ送信
   if ((millis() - can_update) > can_update_period) {
     can_update = millis();
-    if (state == 1) {
-      data[0] = DTARGET_UP;
-    }
-    else {
-      data[0] = DTARGET_DOWN;
-    }
+    data[0] = DTARGET_TELEMETRY;
     data[1] = millis() / 1000 & 0xFF;
     CAN0.sendMsgBuf(MCANID, 0, 2, data);
   }
