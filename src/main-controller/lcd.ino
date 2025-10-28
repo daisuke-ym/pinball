@@ -19,6 +19,7 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
   static uint8_t dtarget1ProgressIndex = 0;
   static uint8_t dtarget2ProgressIndex = 0;
   static uint8_t stargetProgressIndex = 0;
+  static uint8_t jumperProgressIndex = 0;
   static uint8_t slingshot0ProgressIndex = 0;
   static uint8_t slingshot1ProgressIndex = 0;
   static uint8_t bumper0ProgressIndex = 0;
@@ -134,7 +135,8 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
       LCD.setCursor(19, 3);
       switch (rxBuf[0]) {
         case JUMPER_TELEMETRY:
-          LCD.print("-");
+          LCD.write(progressChar[jumperProgressIndex]);
+          jumperProgressIndex = (jumperProgressIndex + 1) % progressLen;
           break;
         case JUMPER_BALL_SENSE:
           LCD.print("S");
