@@ -28,6 +28,7 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
   static uint8_t bumper3ProgressIndex = 0;
   static uint8_t ballsepProgressIndex = 0;
   static uint8_t ballthruProgressIndex = 0;
+  static uint8_t outholeProgressIndex = 0;
 
   // Print CAN ID
   LCD.setCursor(0, 1);
@@ -286,5 +287,30 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
           LCD.print("?");
           break;
       }
+    case OUTHOLE_TX: // アウトホール
+      LCD.setCursor(14, 1);
+      switch (rxBuf[0]) {
+        case OUTHOLE_TELEMETRY:
+          LCD.setCursor(13, 1);
+          LCD.write(progressChar[outholeProgressIndex]);
+          outholeProgressIndex = (outholeProgressIndex + 1) % progressLen;
+          break;
+        case OUTHOLE_WAIT_START:
+          LCD.print("W");
+          break;
+        case OUTHOLE_GAME_START:
+          LCD.print("P");
+          break;
+        case OUTHOLE_DROP_BALL:
+          LCD.print("D");
+          break;
+        case OUTHOLE_DROP_EXTRABALL:
+          LCD.print("E");
+          break;
+        default:
+          LCD.print("?");
+          break;
+      }
+      break;
   }
 }

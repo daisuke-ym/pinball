@@ -129,9 +129,11 @@ const unsigned long LEDBOARD0_RX  = 0x091; // 30連LEDコントローラ
 // アウトホール
 const byte OUTHOLE_TELEMETRY      = 0x00; // 待機中（ボールを打ち出した後の待機状態）
 const byte OUTHOLE_WAIT_START     = 0x01; // スタート待機中
-const byte OUTHOLE_PUSH_START     = 0x02; // スタートボタンが押された（プレイ中：ボールを打ち出したとみなす）
+const byte OUTHOLE_GAME_START     = 0x02; // ゲーム開始（プレイ中：ボールを打ち出したとみなす）
 const byte OUTHOLE_DROP_BALL      = 0x04; // ボールが落ちた
-const byte OUTHOLE_WAIT_EXTRABALL = 0x08; // エクストラボールが落ちてくるのを待機中
+const byte OUTHOLE_DROP_EXTRABALL = 0x08; // エクストラボールが落ちた
+const byte OUTHOLE_WAIT_BALL      = 0x10; // ボールが落ちてくるのを待て
+const byte OUTHOLE_WAIT_EXTRABALL = 0x20; // エクストラボールが落ちてくるのを待て
 // エクストラボール
 const byte EXTRABALL_TELEMETRY = 0x00; // 待機中
 const byte EXTRABALL_SHOOT     = 0x01; // エクストラボール打ち出し中
