@@ -32,6 +32,7 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
   static uint8_t ballsepProgressIndex = 0;
   static uint8_t ballthruProgressIndex = 0;
   static uint8_t outholeProgressIndex = 0;
+  static uint8_t extraballProgressIndex = 0;
 
   /*
   // Print CAN ID
@@ -329,6 +330,25 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
           break;
         case OUTHOLE_DROP_EXTRABALL:
           LCD.print("E");
+          break;
+        default:
+          LCD.print("?");
+          break;
+      }
+      break;
+    case EXTRABALL_TX: // エクストラボール
+      LCD.setCursor(2, 2);
+      switch (rxBuf[0]) {
+        case EXTRABALL_TELEMETRY:
+          LCD.setCursor(2, 3);
+          LCD.write(progressChar[extraballProgressIndex]);
+          extraballProgressIndex = (extraballProgressIndex + 1) % progressLen;
+          break;
+        case EXTRABALL_READY:
+          LCD.print("R");
+          break;
+        case EXTRABALL_SHOOT:
+          LCD.print("S");
           break;
         default:
           LCD.print("?");

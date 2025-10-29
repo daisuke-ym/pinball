@@ -136,7 +136,8 @@ const byte OUTHOLE_WAIT_BALL      = 0x10; // ボールが落ちてくるのを�
 const byte OUTHOLE_WAIT_EXTRABALL = 0x20; // エクストラボールが落ちてくるのを待て
 // エクストラボール
 const byte EXTRABALL_TELEMETRY = 0x00; // 待機中
-const byte EXTRABALL_SHOOT     = 0x01; // エクストラボール打ち出し中
+const byte EXTRABALL_READY     = 0x01; // エクストラボール準備完了
+const byte EXTRABALL_SHOOT     = 0x10; // エクストラボールを打ち出せ
 // タイマー
 const byte TIMER_TELEMETRY = 0x00; // 待機中
 const byte TIMER_COUNTDOWN = 0x01; // カウントダウン中
