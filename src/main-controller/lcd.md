@@ -2,31 +2,33 @@
 
 ```
   01234567890123456789
-0 STAGE:a      OH EB T
-1 bbb bb bb bb c  d  e
-2 BMPR STGT SL BS BT J
-3 gggg hhhh ii j  k  l
+0 S:a         BMPR SL
+1 O E J T TGT #### ##
+2 b c d e fff ST BS BT
+3 * * * * *** *% *% *%
 ```
 
-STAGE: 現在のステージ
+*: テレメトリ - \ | /
+%: 値
+
+S: 現在のステージ
   a: 
-  b: 直前に受信したデータ
-OH: アウトホール
-  c: 
-EB: エクストラボール
-  d: 
-T: タイマー
-  e:
-BMPR: バンパー
-  gggg: 各アイテムの検出状態 _ o
-STGT: ターゲット
-  hhhh: スタンダップターゲット _ 123
-        ドロップターゲット左中右 _ ^
-SL: スリングショット
-  ii: _ o
-BS: ボールセパレータ
-  j: _ o
-BT: ボールスルー
-  k: _ o
+O: アウトホール
+  b: W P
+E: エクストラボール
+  c: W S
 J: ジャンパー
-  l: _ o
+  d: W U
+T: タイマー
+  e: W C U
+TGT: ドロップターゲット
+  fff: H U D
+
+BMPR: バンパー
+  ####: H *
+SL: スリングショット
+  ####: H *
+
+ST: スタンダップターゲット
+BS: ボールセパレータ
+BT: ボールスルー
