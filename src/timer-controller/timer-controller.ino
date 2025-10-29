@@ -24,8 +24,16 @@ unsigned long MCANID = 0; // 自分のCANID（送信用）
 unsigned long rxID;
 unsigned char len = 0;
 unsigned char rxBuf[8];
-
 byte data[4];
+// CANのフィルタ設定
+#define MASK0   0x07FF0000 // 全ビットマスクしているので、Filter0で指定したIDのみ受信する
+#define Filter0 0x00000000 // 受信したいCANIDを設定する
+#define Filter1 0x00000000
+#define MASK1   0x07FF0000
+#define Filter2 0x00000000
+#define Filter3 0x00000000
+#define Filter4 0x00000000
+#define Filter5 0x00000000
 
 const byte LATCH = 2;
 
@@ -130,7 +138,7 @@ void setup() {
   MCANID = CANID + 0x100;
 
   // Initialize MCP2515 running at 16MHz with a baudrate of 500kb/s and the masks and filters disabled.
-  if (CAN0.begin(MCP_ANY, CAN_500KBPS, MCP_16MHZ) == CAN_OK) {
+  if (CAN0.begin(MCP_STDEXT, CAN_500KBPS, MCP_16MHZ) == CAN_OK) {
     // Serial.println("MCP2515 Initialized Successfully!");
     data[0] = ~ShiftData;
   }
@@ -138,8 +146,16 @@ void setup() {
     // Serial.println("Error Initializing MCP2515...");
   }
 
+  CAN0.init_Mask(0, 0, MASK0);
+  CAN0.init_Mask(1, 0, MASK1);
+  CAN0.init_Filt(0, 0, (CANID << 16)); // 自身のCANIDだけ受信する
+  CAN0.init_Filt(1, 0, Filter1);
+  CAN0.init_Filt(2, 0, Filter2); 
+  CAN0.init_Filt(3, 0, Filter3);
+  CAN0.init_Filt(4, 0, Filter4);
+  CAN0.init_Filt(5, 0, Filter5);
   CAN0.setMode(MCP_NORMAL); // Change to normal mode to allow messages to be transmitted
-  delay(100);
+  delay(random(1000));
   data[0] = CANID;
   data[1] = TIMER_TELEMETRY;
   CAN0.sendMsgBuf(MCANID, 0, 2, data);
@@ -205,6 +221,7 @@ void loop() {
   if (state == 1) {
     // カウントダウン処理
     tt = (end_time - millis()) / 1000 + 1;
+    /*
     // LED表示
     if ((micros() - led_update) > led_update_period) {
       if (blank < 0) {
@@ -221,6 +238,7 @@ void loop() {
       blank--;
       led_update = micros();
     }
+    */
     // タイムアップ
     if (millis() > end_time) {
       // タイムアップメッセージ送信
@@ -231,6 +249,7 @@ void loop() {
       tt = 0;
       // 7セグ表示更新（次の点滅処理の前に0を表示させる）
       disp7seg(tt);
+      /*
       // LEDを点滅させる
       for (uint8_t n = 0; n < 5; n++) {
         for (uint8_t i = 0; i < NUMPIXELS; i++) {
@@ -242,9 +261,11 @@ void loop() {
         }
         delay(50);
       }
+      */
     }
   }
 
+  /*
   // タイマ停止中
   if (state == 0) {
     if ((micros() - led_update) > led_update_period) {
@@ -258,6 +279,7 @@ void loop() {
       led_update = micros();
     }
   }
+  */
   
   // 7セグ表示更新
   if ((millis() - seg_update) > seg_update_period) {
