@@ -53,7 +53,7 @@ const int CK = 7;
 const int DEBOUNCE = 50; // チャタリング無視時間(ms)
 
 // 受信コマンド
-const byte EXTRABALL_SHOOT     = 0x10; // ボールが落ちてくるのを待て
+const byte EXTRABALL_SHOOT     = 0x10; // エクストラボールを打ち出せ
 
 // 送信コマンド
 const byte EXTRABALL_TELEMETRY = 0x00; // テレメトリ
@@ -139,6 +139,7 @@ void setup() {
 // ----------------------------------------------------------------------
 void loop() {
   static uint8_t ExtraBallShoot = 0; // 0:エクストラボール待機中    1:エクストラボール打ち出し中
+  static int sensor2_state = HIGH;
   static unsigned long can_update = 0;
   const unsigned long can_update_period = 5000; // テレメトリー送信間隔（ミリ秒）
 
@@ -150,24 +151,28 @@ void loop() {
       digitalWrite(SOL1, HIGH);
       delay(10);
       digitalWrite(SOL1, LOW);
-      // センサ2が検知するまで待機して，検知したらエクストラボール待機中のメッセージ送信
-      while (digitalRead(SENSOR2) == HIGH) {
-        // wait
-        delay(10);
-      }
-      data[1] = EXTRABALL_READY;
-      CAN0.sendMsgBuf(MCANID, 0, 2, data);
     }
   }
 
-  // ボールセンサ2が検知したとき
-  if (digitalRead(SENSOR2) == LOW) {
-    // エクストラボール待機中のメッセージ送信
-    if (ExtraBallShoot == 1) {
-      data[0] = EXTRABALL_READY;
-      CAN0.sendMsgBuf(MCANID, 0, 1, data);
+  // ボールセンサ2の状態変化を検出してメッセージを送信する
+  if (digitalRead(SENSOR2) != sensor2_state) {
+    delay(DEBOUNCE);
+    if (digitalRead(SENSOR2) != sensor2_state) {
+      sensor2_state = digitalRead(SENSOR2);
+      // センサ2が検知したとき
+      if (sensor2_state == LOW) {
+        // エクストラボール待機中のメッセージ送信
+        data[0] = EXTRABALL_READY;
+        CAN0.sendMsgBuf(MCANID, 0, 1, data);
+        ExtraBallShoot = 0;
+      }
+      else {
+        // エクストラボール打ち出し中のメッセージ送信
+        data[0] = EXTRABALL_SHOOT;
+        CAN0.sendMsgBuf(MCANID, 0, 1, data);
+        ExtraBallShoot = 1;
+      }
     }
-    ExtraBallShoot = 0;
   }
 
   // メッセージ受信
