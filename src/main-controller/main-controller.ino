@@ -1,7 +1,8 @@
 #include <LiquidCrystal.h>
 #include <mcp_can.h>
 #include <SPI.h>
-#include "defines.h"
+#include "def-vars.h"
+#include "def-can.h"
 
 const byte LCD_RS = A0, LCD_RW = A1, LCD_E = A2, LCD_D4 = A3, LCD_D5 = A4, LCD_D6 = A5, LCD_D7 = A6;
 LiquidCrystal LCD(LCD_RS, LCD_RW, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
