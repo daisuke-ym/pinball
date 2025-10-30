@@ -1,6 +1,7 @@
 #include <LiquidCrystal.h>
 #include <mcp_can.h>
 #include <SPI.h>
+#include <DFRobotDFPlayerMini.h>
 #include "def-vars.h"
 #include "def-can.h"
 
@@ -63,10 +64,43 @@ byte progressChar[] = {
 };
 byte progressLen = sizeof(progressChar) / sizeof(byte);
 
+// DFPlayer 関係
+DFRobotDFPlayerMini MP3B; // 左側（BGM担当）
+DFRobotDFPlayerMini MP3J; // 右側（効果音担当）
+
 // ----------------------------------------------------------------------
 void setup() {
 	// Serial初期化
 	Serial.begin(115200);
+
+  // DFPlayer 関係
+  Serial3.begin(9600); // 左側（BGM担当）
+  if (!MP3B.begin(Serial3)) {
+    Serial.println(F("Unable to begin:"));
+    Serial.println(F("1.Please recheck the connection!"));
+    Serial.println(F("2.Please insert the SD card!"));
+    while (true) {
+      delay(0); // Code to compatible with ESP8266 watch dog.
+    }
+  }
+  Serial.println(F("DFPlayer Mini online."));
+  MP3B.setTimeOut(100);
+  MP3B.volume(10);  //Set volume value. From 0 to 30
+  //MP3B.play(1);
+  Serial2.begin(9600); // 右側（効果音担当）
+  if (!MP3J.begin(Serial2)) {
+    Serial.println(F("Unable to begin:"));
+    Serial.println(F("1.Please recheck the connection!"));
+    Serial.println(F("2.Please insert the SD card!"));
+    while (true) {
+      delay(0); // Code to compatible with ESP8266 watch dog.
+    }
+  }
+  Serial.println(F("DFPlayer Mini online."));
+  MP3J.setTimeOut(100);
+  MP3J.volume(20);  //Set volume value. From 0 to 30
+  //MP3J.play(1);
+
 	// LCD初期化
 	LCD.begin(20, 4);
   LCD.createChar(0, customChar0);
@@ -185,10 +219,14 @@ void game_logic(unsigned long id, byte len, unsigned char* buf) {
           IsPlaying = 1;
           STAGE = 0;
           init_board();
+          // BGM再生
+          MP3B.loop(STAGE + 1);
           Serial.println("### Game started!");
           break;
         case OUTHOLE_DROP_BALL:
           IsPlaying = 0;
+          // BGM停止
+          MP3B.stop();
           Serial.println("### Game over!");
           break;
       }
@@ -338,7 +376,7 @@ void game_logic(unsigned long id, byte len, unsigned char* buf) {
     Serial.print("###  Stop timer");
     Serial.println();
     // BGM再生
-    //MP3B.loop(STAGE + 1);
+    MP3B.loop(STAGE + 1);
     // debug
     Serial.print("###  Stage: ");
     Serial.print(STAGE + 1);
