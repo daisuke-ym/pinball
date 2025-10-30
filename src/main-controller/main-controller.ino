@@ -105,6 +105,9 @@ void loop() {
 		CAN0.readMsgBuf(&rxId, &rxLen, rxBuf); // Read data: len = data length, buf = data byte(s)
 
 		disp_lcd_can_message(rxId, rxLen, rxBuf);
+
+    // ゲームロジック
+    game_logic(rxId, rxLen, rxBuf);
 	}
 
   serialInterface();
@@ -154,5 +157,80 @@ int wait_for_CAN_message(unsigned long id, byte expectedCmd) {
   else {
     delay(1);
     return 0;
+  }
+}
+
+// ----------------------------------------------------------------------
+// ゲームロジック本体
+void game_logic(unsigned long id, byte len, unsigned char* buf) {
+  int score = 0;
+  static uint8_t IsPlaying = 0; // ゲームプレイ中フラグ  0:ゲームオーバー中  1:プレイ中
+  static uint8_t IsSendScore = 0; // スコア送信フラグ  0:送信不要  1:送信必要
+  static uint8_t IsHitDTarget = 0; // ドロップターゲット当たりフラグ  0:当たりなし  1,2,4:当たりあり
+  static unsigned long DTargetTimer[3]; // ドロップターゲット当たりから次上げるまでのタイマー
+  static uint8_t IsStartTimer = 0; // ステージタイマー起動フラグ  0:停止中  1:起動中
+  static unsigned long DTStageTimer = 0; // 最初のドロップターゲット当たりから始まるタイマー
+  static uint8_t LastTargetState = 0, TargetState = 0;
+  
+  // ---------- 各アイテムの処理 ----------
+  switch (id) {
+    // ----- アウトホール -----
+    case OUTHOLE_TX:
+      switch (buf[0]) {
+        case OUTHOLE_GAME_START:
+          IsPlaying = 1;
+          init_board();
+          Serial.println("### Game started!");
+          break;
+        case OUTHOLE_DROP_BALL:
+          IsPlaying = 0;
+          Serial.println("### Game over!");
+          break;
+      }
+      break;
+    // ----- ボールセパレータ -----
+    case BALLSEP_TX:
+      if (buf[0] == BALLSEP_HIT) {
+        score = SCORE[BALLSEP]; 
+        IsSendScore = 1;
+      }
+      break;
+    // ----- ボールスルー -----
+    case BALLTHRU_TX:
+      if (buf[0] == BALLTHRU_HIT) {
+        score = SCORE[BALLTHRU]; 
+        IsSendScore = 1;
+      }
+      break;
+    // ----- バンパー -----
+    case BUMPER0_TX: // 左バンパー
+    case BUMPER1_TX: // 中バンパー
+    case BUMPER2_TX: // 右バンパー
+      if (buf[0] == BUMPER_HIT) {
+        score = SCORE[BUMPER0]; // 左中右バンパーは同じ得点
+        IsSendScore = 1;
+      }
+      break;
+    case BUMPER3_TX: // 上バンパー
+      if (buf[0] == BUMPER_HIT) {
+        score = SCORE[BUMPER3]; // 上バンパーだけ別得点
+        IsSendScore = 1;
+      }
+      break;
+  }
+
+  // ---------- スコア送信 ----------
+  if (IsSendScore == 1) {
+    data[0] = SCOREBOARD_SCORE;
+    data[1] = score;
+    data[2] = STAGE_MUL[STAGE];
+    byte ret = CAN0.sendMsgBuf(SCOREBOARD_RX, 0, 3, data);
+    if (ret == CAN_OK) {
+      Serial.println("*** score send done ***");
+      IsSendScore = 0; // スコア送信したらフラグを下げる
+    }
+    else {
+      Serial.println("*** error send message ***");
+    }
   }
 }
