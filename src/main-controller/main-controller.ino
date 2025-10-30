@@ -93,6 +93,9 @@ void setup() {
   }
   CAN0.setMode(MCP_NORMAL);  // Set operation mode to normal so the MCP2515 sends acks to received data.
   pinMode(CAN0_INT, INPUT);  // Configuring pin for /INT input
+
+  // ゲーム開始前の初期化
+  init_board();
 }
 
 // ----------------------------------------------------------------------
@@ -105,4 +108,51 @@ void loop() {
 	}
 
   serialInterface();
+}
+
+// ----------------------------------------------------------------------
+// ゲーム開始前にボードの初期化をする
+void init_board() {
+  // debug message
+  Serial.println("### Init board...");
+  // 得点板クリア
+  data[0] = SCOREBOARD_CLEAR;
+  CAN0.sendMsgBuf(SCOREBOARD_RX, 0, 1, data);
+  // タイマー停止
+  do {
+    data[0] = TIMER_STOP;
+    CAN0.sendMsgBuf(TIMERBOARD_RX, 0, 1, data);
+  } while (wait_for_CAN_message(TIMERBOARD_RX, TIMER_STOP) == 0);
+  // ドロップターゲット上げる
+  do {
+    data[0] = DTARGET_UP;
+    CAN0.sendMsgBuf(DTARGET0_RX, 0, 1, data);
+  } while (wait_for_CAN_message(DTARGET0_RX, DTARGET_UP) == 0);
+  do {
+    data[0] = DTARGET_UP;
+    CAN0.sendMsgBuf(DTARGET1_RX, 0, 1, data);
+  } while (wait_for_CAN_message(DTARGET1_RX, DTARGET_UP) == 0);
+  do {
+    data[0] = DTARGET_UP;
+    CAN0.sendMsgBuf(DTARGET2_RX, 0, 1, data);
+  } while (wait_for_CAN_message(DTARGET2_RX, DTARGET_UP) == 0);
+
+}
+
+// ----------------------------------------------------------------------
+// 指定した CANID とコマンドを待つ
+// コマンドを送っただけでは取りこぼし等で動作しないことがあるので、
+// ちゃんと返事が来るまでループするために使う
+// 戻り値: 1=成功、0=失敗（まだメッセージが来ていない）
+int wait_for_CAN_message(unsigned long id, byte expectedCmd) {
+  if (digitalRead(CAN0_INT) == LOW) {
+    CAN0.readMsgBuf(&rxId, &rxLen, rxBuf);
+    if (rxId == id && rxBuf[0] == expectedCmd) {
+      return 1; // success
+    }
+  }
+  else {
+    delay(1);
+    return 0;
+  }
 }
