@@ -141,9 +141,9 @@ void setup() {
 
   delay(random(1000));
   data[0] = CANID;
-  data[1] = OUTHOLE_TELEMETRY;
+  data[1] = OUTHOLE_WAIT_START;
   CAN0.sendMsgBuf(MCANID, 0, 2, data);
-  
+
   /*
   while (1) {
     servo_test();
@@ -154,6 +154,7 @@ void setup() {
 // ----------------------------------------------------------------------
 void loop() {
   static uint8_t GameState = 0; // 0:初期待機中    1:ゲーム中
+  static uint8_t lastGameState = 0; // 前回のゲーム状態
   static uint8_t EbState = 0;   // 0:エクストラボール待機中    1:エクストラボール打ち出し中
   static unsigned long can_update = 0;
   const unsigned long can_update_period = 5000; // テレメトリー送信間隔（ミリ秒）
@@ -176,6 +177,8 @@ void loop() {
           delay(10);
         }
         SV.write(SV_CENTER);
+        data[0] = OUTHOLE_WAIT_START;
+        CAN0.sendMsgBuf(MCANID, 0, 1, data);
       }
       else {
         // エクストラボール打ち出し中は，エクストラボール側にボールを流す
@@ -229,6 +232,19 @@ void loop() {
     data[0] = OUTHOLE_TELEMETRY;
     data[1] = millis() / 1000 & 0xFF;
     CAN0.sendMsgBuf(MCANID, 0, 2, data);
+    //
+    if (GameState != lastGameState) {
+      lastGameState = GameState;
+      if (GameState == 0) {
+        // 待機中に変化した時
+        data[0] = OUTHOLE_WAIT_START;
+        CAN0.sendMsgBuf(MCANID, 0, 1, data);
+      }
+      else {
+        data[0] = OUTHOLE_GAME_START;
+        CAN0.sendMsgBuf(MCANID, 0, 1, data);
+      }
+    }
   }
 }
 
