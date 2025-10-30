@@ -1,5 +1,6 @@
 {
     "sketch": "main-controller.ino",
     "board": "arduino:avr:mega",
-    "port": "COM8"
+    "port": "COM8",
+    "output": "D:\\temp\\Arduino\\main-controller"
 }
