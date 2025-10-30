@@ -232,6 +232,24 @@ void game_logic(unsigned long id, byte len, unsigned char* buf) {
         IsSendScore = 1;
       }
       break;
+    // ----- ジャンパー -----
+    case JUMPER_TX:
+      if (buf[0] == JUMPER_BALL_SENSE) {
+        delay(500); // ボールがジャンパーに乗ってから打ち上げるまで少し待つ
+        score = SCORE[JUMPER]; 
+        IsSendScore = 1;
+        // エクストラボール打ち出し
+        do {
+          data[0] = EXTRABALL_SHOOT;
+          CAN0.sendMsgBuf(EXTRABALL_RX, 0, 1, data);
+        } while (wait_for_CAN_message(EXTRABALL_TX, EXTRABALL_SHOOT) == 0);
+        delay(10);
+        do {
+          data[0] = OUTHOLE_WAIT_EXTRABALL;
+          CAN0.sendMsgBuf(OUTHOLE_RX, 0, 1, data);
+        } while (wait_for_CAN_message(OUTHOLE_TX, OUTHOLE_WAIT_EXTRABALL) == 0);
+      }
+      break;
   }
 
   // ---------- スコア送信 ----------
