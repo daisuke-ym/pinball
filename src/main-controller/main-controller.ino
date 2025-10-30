@@ -217,6 +217,21 @@ void game_logic(unsigned long id, byte len, unsigned char* buf) {
         IsSendScore = 1;
       }
       break;
+    // ----- スタンダップターゲット -----
+    case STARGET_TX:
+      if (buf[0] == STARGET_HIT) {
+        score = SCORE[STARGET]; 
+        IsSendScore = 1;
+      }
+      break;
+    // ----- スリングショット -----
+    case SLING0_TX: // 左スリングショット
+    case SLING1_TX: // 右スリングショット
+      if (buf[0] == SLING_HIT) {
+        score = SCORE[SLING0]; // 左右スリングショットは同じ得点
+        IsSendScore = 1;
+      }
+      break;
   }
 
   // ---------- スコア送信 ----------
