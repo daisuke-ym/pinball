@@ -127,6 +127,11 @@ void init_board() {
     CAN0.sendMsgBuf(TIMERBOARD_RX, 0, 1, data);
   } while (wait_for_CAN_message(TIMERBOARD_RX, TIMER_STOP) == 0);
   // ドロップターゲット上げる
+  up_all_dtarget();
+}
+// ----------------------------------------------------------------------
+void up_all_dtarget() {
+  // ドロップターゲット上げる
   do {
     data[0] = DTARGET_UP;
     CAN0.sendMsgBuf(DTARGET0_RX, 0, 1, data);
@@ -139,7 +144,6 @@ void init_board() {
     data[0] = DTARGET_UP;
     CAN0.sendMsgBuf(DTARGET2_RX, 0, 1, data);
   } while (wait_for_CAN_message(DTARGET2_RX, DTARGET_UP) == 0);
-
 }
 
 // ----------------------------------------------------------------------
@@ -170,7 +174,7 @@ void game_logic(unsigned long id, byte len, unsigned char* buf) {
   static unsigned long DTargetTimer[3]; // ドロップターゲット当たりから次上げるまでのタイマー
   static uint8_t IsStartTimer = 0; // ステージタイマー起動フラグ  0:停止中  1:起動中
   static unsigned long DTStageTimer = 0; // 最初のドロップターゲット当たりから始まるタイマー
-  static uint8_t LastTargetState = 0, TargetState = 0;
+  static uint8_t LastDTargetState = 0, DTargetState = 0;
   
   // ---------- 各アイテムの処理 ----------
   switch (id) {
@@ -179,6 +183,7 @@ void game_logic(unsigned long id, byte len, unsigned char* buf) {
       switch (buf[0]) {
         case OUTHOLE_GAME_START:
           IsPlaying = 1;
+          STAGE = 0;
           init_board();
           Serial.println("### Game started!");
           break;
@@ -250,6 +255,101 @@ void game_logic(unsigned long id, byte len, unsigned char* buf) {
         } while (wait_for_CAN_message(OUTHOLE_TX, OUTHOLE_WAIT_EXTRABALL) == 0);
       }
       break;
+    // ----- ドロップターゲット -----
+    case DTARGET0_TX: // 左ドロップターゲット
+      if (buf[0] == DTARGET_HIT) {
+        // 当たりフラグを立てる
+        DTargetState |= 0x01;
+        score = SCORE[DTARGET0]; 
+        IsSendScore = 1;
+        // ターゲットを下げる
+        do {
+          data[0] = DTARGET_DOWN;
+          CAN0.sendMsgBuf(DTARGET0_RX, 0, 1, data);
+        } while (wait_for_CAN_message(DTARGET0_TX, DTARGET_DOWN) == 0);
+      }
+      break;
+    case DTARGET1_TX: // 中ドロップターゲット
+      if (buf[0] == DTARGET_HIT) {
+        // 当たりフラグを立てる
+        DTargetState |= 0x02;
+        score = SCORE[DTARGET1]; 
+        IsSendScore = 1;
+        // ターゲットを下げる
+        do {
+          data[0] = DTARGET_DOWN;
+          CAN0.sendMsgBuf(DTARGET1_RX, 0, 1, data);
+        } while (wait_for_CAN_message(DTARGET1_TX, DTARGET_DOWN) == 0);
+      }
+      break;
+    case DTARGET2_TX: // 右ドロップターゲット
+      if (buf[0] == DTARGET_HIT) {
+        // 当たりフラグを立てる
+        DTargetState |= 0x04;
+        score = SCORE[DTARGET2]; 
+        IsSendScore = 1;
+        // ターゲットを下げる
+        do {
+          data[0] = DTARGET_DOWN;
+          CAN0.sendMsgBuf(DTARGET2_RX, 0, 1, data);
+        } while (wait_for_CAN_message(DTARGET2_TX, DTARGET_DOWN) == 0);
+      }
+      break;
+    // ----- タイマー -----
+    case TIMERBOARD_TX:
+      switch (buf[0]) {
+        case TIMER_TIMEUP:
+          IsStartTimer = 0;
+          Serial.println("### Time up!");
+          // ドロップターゲット上げる
+          up_all_dtarget();
+          DTargetState = 0;
+          break;
+      }
+      break;
+  }
+
+  // ---------- タイマー開始条件 ----------
+  if ((DTargetState != LastDTargetState) && (DTargetState == 0x01 || DTargetState == 0x02 || DTargetState == 0x04)) {
+    IsStartTimer = 1;
+    do {
+      data[0] = TIMER_SET;
+      data[1] = DT_TIMEOUT[STAGE];
+      CAN0.sendMsgBuf(TIMERBOARD_RX, 0, 2, data);
+    } while (wait_for_CAN_message(TIMERBOARD_TX, TIMER_COUNTDOWN) == 0);
+    // debug
+    Serial.print("###  Start timer: ");
+    Serial.print(data[1]);
+    Serial.println();
+  }
+  LastDTargetState = DTargetState;
+
+  // ---------- ステージ遷移 ----------
+  if (DTargetState >= 7) {
+    STAGE++;
+    if (STAGE > NUM_STAGES) {
+      STAGE = NUM_STAGES;
+    }
+    // タイマー停止
+    IsStartTimer = 0;
+    data[0] = TIMER_STOP;
+    CAN0.sendMsgBuf(TIMERBOARD_RX, 0, 1, data);
+    // debug
+    Serial.print("###  Stop timer");
+    Serial.println();
+    // BGM再生
+    //MP3B.loop(STAGE + 1);
+    // debug
+    Serial.print("###  Stage: ");
+    Serial.print(STAGE + 1);
+    Serial.println();
+    // 全部のターゲットを上げる
+    delay(2000); // ターゲットを上げるまでのディレイ
+    up_all_dtarget();
+    DTargetState = 0;
+    // フラグクリア
+    DTargetState = 0;
+    LastDTargetState = 0;
   }
 
   // ---------- スコア送信 ----------
