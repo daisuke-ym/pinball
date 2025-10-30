@@ -359,11 +359,11 @@ void game_logic(unsigned long id, byte len, unsigned char* buf) {
     data[2] = STAGE_MUL[STAGE];
     byte ret = CAN0.sendMsgBuf(SCOREBOARD_RX, 0, 3, data);
     if (ret == CAN_OK) {
-      Serial.println("*** score send done ***");
+      //Serial.println("*** score send done ***");
       IsSendScore = 0; // スコア送信したらフラグを下げる
     }
     else {
-      Serial.println("*** error send message ***");
+      //Serial.println("*** error send message ***");
     }
   }
 }
