@@ -160,6 +160,12 @@ void init_board() {
     data[0] = TIMER_STOP;
     CAN0.sendMsgBuf(TIMERBOARD_RX, 0, 1, data);
   } while (wait_for_CAN_message(TIMERBOARD_RX, TIMER_STOP) == 0);
+  // ステージ番号送信
+  do {
+    data[0] = TIMER_STAGE_NUM;
+    data[1] = STAGE + 1;
+    CAN0.sendMsgBuf(TIMERBOARD_RX, 0, 2, data);
+  } while (wait_for_CAN_message(TIMERBOARD_TX, TIMER_STAGE_NUM) == 0);
   // ドロップターゲット上げる
   up_all_dtarget();
 }
@@ -219,12 +225,6 @@ void game_logic(unsigned long id, byte len, unsigned char* buf) {
           IsPlaying = 1;
           STAGE = 0;
           init_board();
-          // ステージ番号送信
-          do {
-            data[0] = TIMER_STAGE_NUM;
-            data[1] = STAGE + 1;
-            CAN0.sendMsgBuf(TIMERBOARD_RX, 0, 2, data);
-          } while (wait_for_CAN_message(TIMERBOARD_TX, TIMER_STAGE_NUM) == 0);
           // BGM再生
           MP3B.loop(STAGE + 1);
           Serial.println("### Game started!");
