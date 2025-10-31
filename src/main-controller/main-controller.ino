@@ -231,7 +231,11 @@ void game_logic(unsigned long id, byte len, unsigned char* buf) {
           break;
         case OUTHOLE_DROP_BALL:
           IsPlaying = 0;
-          init_board();
+          // タイマー停止
+          do {
+            data[0] = TIMER_STOP;
+            CAN0.sendMsgBuf(TIMERBOARD_RX, 0, 1, data);
+          } while (wait_for_CAN_message(TIMERBOARD_TX, TIMER_STOP) == 0);
           // BGM停止
           MP3B.stop();
           Serial.println("### Game over!");
