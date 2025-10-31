@@ -179,7 +179,7 @@ void loop() {
   static int hue = 0; // LEDの色相
   static int blank = NUMPIXELS - 1;
   static unsigned long can_update = 0;
-  const unsigned long can_update_period = 5000; // テレメトリー送信間隔（ミリ秒）
+  const unsigned long can_update_period = 2000; // テレメトリー送信間隔（ミリ秒）
 
   if (!digitalRead(CAN0_INT)) {
     // メッセージ受信
@@ -194,6 +194,8 @@ void loop() {
       tt = rxBuf[1];
       start_time = millis();
       end_time = start_time + tt * 1000;
+      // 受信コマンドのアンサーバック
+      delay(10);
       data[0] = TIMER_COUNTDOWN;
       CAN0.sendMsgBuf(MCANID, 0, 1, data);
     }
@@ -201,6 +203,10 @@ void loop() {
     if (rxID == CANID && rxBuf[0] == TIMER_STOP) {
       state = 0;
       tt = 0;
+      // 受信コマンドのアンサーバック
+      delay(10);
+      data[0] = TIMER_STOP;
+      CAN0.sendMsgBuf(MCANID, 0, 1, data);
     }
   }
 
