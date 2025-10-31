@@ -10,12 +10,8 @@
 */
 #include <mcp_can.h>
 #include <SPI.h>
-#include <tinyNeoPixel_Static.h>
 
 #define LEDPIN 9
-#define NUMPIXELS 12
-byte PIXELS[NUMPIXELS * 3];
-tinyNeoPixel LED = tinyNeoPixel(NUMPIXELS, LEDPIN, NEO_GRB, PIXELS);
 
 MCP_CAN CAN0(3);
 #define CAN0_INT 7
@@ -61,6 +57,7 @@ const byte digits[] = {
   0b10000000, // 8
   0b10010000, // 9
   0b10111111, // -
+  0b10110111, // =
   0b11111111, // blank
 };
 
@@ -100,19 +97,29 @@ void disp7seg(int value) {
   int v = value;
   int dig[2];
 
-  dig[1] = int(v / 10);
-  v -= dig[1] * 10;
-  dig[0] = v;
-
-  digitalWrite(LATCH, LOW);
-  if (dig[1] == 0) {
-    SPI.transfer(digits[11]); // blank
+  // マイナス値はステージ番号
+  if (v < 0) {
+    v = -v;
+    digitalWrite(LATCH, LOW);
+    SPI.transfer(digits[11]); // =
+    SPI.transfer(digits[v % 10]);
+    digitalWrite(LATCH, HIGH);
   }
   else {
-    SPI.transfer(digits[dig[1]]);
+    dig[1] = int(v / 10);
+    v -= dig[1] * 10;
+    dig[0] = v;
+
+    digitalWrite(LATCH, LOW);
+    if (dig[1] == 0) {
+      SPI.transfer(digits[12]); // blank
+    }
+    else {
+      SPI.transfer(digits[dig[1]]);
+    }
+    SPI.transfer(digits[dig[0]]);
+    digitalWrite(LATCH, HIGH);
   }
-  SPI.transfer(digits[dig[0]]);
-  digitalWrite(LATCH, HIGH);
 }
 
 // ----------------------------------------------------------------------
@@ -168,16 +175,15 @@ void setup() {
 
 // ----------------------------------------------------------------------
 void loop() {
+  static int stage_num = 0; // ステージ番号（タイマ停止中はステージ番号を表示する）
+  static unsigned long stage_num_update = 0;
+  const unsigned long stage_num_update_period = 1000; // ステージ番号更新間隔（ミリ秒）
   static int state = 0; // タイマの状態  0:タイマ停止  1:タイマ開始
   static unsigned long seg_update = 0;
   const unsigned long seg_update_period = 50; // ミリ秒
   static unsigned long start_time = 0;
   static unsigned long end_time = 0;
   static long tt = 0; // タイマ時間
-  static unsigned long led_update = 0;
-  const unsigned long led_update_period = 74525; // マイクロ秒
-  static int hue = 0; // LEDの色相
-  static int blank = NUMPIXELS - 1;
   static unsigned long can_update = 0;
   const unsigned long can_update_period = 2000; // テレメトリー送信間隔（ミリ秒）
 
@@ -208,11 +214,20 @@ void loop() {
       data[0] = TIMER_STOP;
       CAN0.sendMsgBuf(MCANID, 0, 1, data);
     }
+    // TIMER_STAGE_NUM コマンド（ステージ番号送信）を受け取った時の処理
+    if (rxID == CANID && rxBuf[0] == TIMER_STAGE_NUM) {
+      stage_num = rxBuf[1];
+      disp7seg(-1 * stage_num);
+      // 受信コマンドのアンサーバック
+      delay(10);
+      data[0] = TIMER_STAGE_NUM;
+      CAN0.sendMsgBuf(MCANID, 0, 1, data);
+    }
   }
 
+  // テレメトリ送信
   if ((millis() - can_update) > can_update_period) {
     can_update = millis();
-    // テレメトリ送信
     if (state == 1) {
       data[0] = TIMER_COUNTDOWN;
     }
@@ -227,24 +242,10 @@ void loop() {
   if (state == 1) {
     // カウントダウン処理
     tt = (end_time - millis()) / 1000 + 1;
-    /*
-    // LED表示
-    if ((micros() - led_update) > led_update_period) {
-      if (blank < 0) {
-        blank = NUMPIXELS - 1;
-      }
-      for (int i = NUMPIXELS - 1; i >= 0; i--) {
-        if (i == blank) {
-          LEDHSB(i, (hue + 180) % 360, SAT, BRI);
-        }
-        else {
-          LEDHSB(i, hue, SAT, BRI);
-        }
-      }
-      blank--;
-      led_update = micros();
+    if ((millis() - seg_update) > seg_update_period) {
+      disp7seg(tt);
+      seg_update = millis();
     }
-    */
     // タイムアップ
     if (millis() > end_time) {
       // タイムアップメッセージ送信
@@ -253,89 +254,16 @@ void loop() {
       // タイマを止める
       state = 0;
       tt = 0;
-      // 7セグ表示更新（次の点滅処理の前に0を表示させる）
+      // 7セグ表示更新
       disp7seg(tt);
-      /*
-      // LEDを点滅させる
-      for (uint8_t n = 0; n < 5; n++) {
-        for (uint8_t i = 0; i < NUMPIXELS; i++) {
-          LEDHSB(i, hue, SAT, BRI);
-        }
-        delay(50);
-        for (uint8_t i = 0; i < NUMPIXELS; i++) {
-          LEDHSB(i, (hue + 180) % 360, SAT, BRI);
-        }
-        delay(50);
-      }
-      */
+      stage_num_update = millis(); // タイムアップ後0を1秒間表示するための処理
     }
   }
-
-  /*
-  // タイマ停止中
-  if (state == 0) {
-    if ((micros() - led_update) > led_update_period) {
-      hue += 1;
-      if (hue >= 360) {
-        hue = 0;
-      }
-      for (int i = 0; i < NUMPIXELS; i++) {
-        LEDHSB(i, hue, SAT, BRI);
-      }
-      led_update = micros();
+  else {
+    // タイマ停止中はステージ番号を表示する
+    if (millis() - stage_num_update > stage_num_update_period) {
+      stage_num_update = millis();
+      disp7seg(-1 * stage_num);
     }
   }
-  */
-  
-  // 7セグ表示更新
-  if ((millis() - seg_update) > seg_update_period) {
-    disp7seg(tt);
-    seg_update = millis();
-  }
-}
-
-// ----------------------------------------------------------------------
-// HSBで表現した色でLEDを点灯させる
-//   i: LEDのインデックス
-//   h: 色相 (0-360)
-//   s: 彩度 (0-100)
-//   b: 明度 (0-100)
-void LEDHSB(int i, float h, float s, float b) {
-  int R, G, B;
-
-  if (s == 0) {
-    R = G = B = b * 255;
-  } else {
-    h /= 360.0;
-    s /= 100.0;
-    b /= 100.0;
-
-    int x = (int)(h * 6);
-    float f = (h * 6) - x;
-    float p = b * (1 - s);
-    float q = b * (1 - s * f);
-    float t = b * (1 - s * (1 - f));
-    
-    if (x == 0) {
-      R = b * 255; G = t * 255; B = p * 255;
-    }
-    else if (x == 1) {
-      R = q * 255; G = b * 255; B = p * 255;
-    }
-    else if (x == 2) {
-      R = p * 255; G = b * 255; B = t * 255;
-    }
-    else if (x == 3) {
-      R = p * 255; G = q * 255; B = b * 255;
-    }
-    else if (x == 4) {
-      R = t * 255; G = p * 255; B = b * 255;
-    }
-    else {
-      R = b * 255; G = p * 255; B = q * 255;
-    }
-  }
-
-  LED.setPixelColor(i, LED.Color(R, G, B));
-  LED.show();
 }
