@@ -83,3 +83,19 @@ const byte DT_TIMEOUT[] = { // 秒
   20, // Stage 8
   10, // Stage 9
 };
+
+// ----------------------------------------------------------------------
+// 効果音のインデックス
+enum _jingle_sounds {
+  JINGLE_BALLSEP   = 1,  // ボールセパレータ
+  JINGLE_BALLTHRU  = 2,  // ボールスルー
+  JINGLE_JUMPER    = 3,  // ジャンパー
+  JINGLE_BUMPER0   = 5,  // バンパー
+  JINGLE_BUMPER1   = 6,  // バンパー
+  JINGLE_BUMPER2   = 7,  // バンパー
+  JINGLE_BUMPER3   = 8,  // バンパー
+  JINGLE_SLING     = 9,  // スリングショット
+  JINGLE_STARGET   = 10, // スタンダップターゲット
+  JINGLE_DTARGET   = 11, // ドロップターゲット
+  JINGLE_EXTRABALL = 12, // エクストラボール
+} JINGLE_SOUNDS;
