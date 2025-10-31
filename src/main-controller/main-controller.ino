@@ -231,6 +231,7 @@ void game_logic(unsigned long id, byte len, unsigned char* buf) {
           break;
         case OUTHOLE_DROP_BALL:
           IsPlaying = 0;
+          init_board();
           // BGM停止
           MP3B.stop();
           Serial.println("### Game over!");
