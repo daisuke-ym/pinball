@@ -95,17 +95,56 @@ void serialInterface() {
       
       // データが正常に処理された場合、CANバスにデータを流し確認メッセージを表示する
       if (valueCount > 0) {
-        char msg[20];
-        CAN0.sendMsgBuf(canId, 0, payloadLength, payload);
-        sprintf(msg, "Send --> 0x%03X ", canId);
-        Serial.print(msg);
-        sprintf(msg, "(%d) ", payloadLength);
-        Serial.print(msg);
-        for (int i = 0; i < payloadLength; i++) {
-          sprintf(msg, "0x%02X ", payload[i]);
-          Serial.print(msg);
+        if (canId == 0x0) {
+          // canId == 0 は DFPlayerMini の操作として扱う
+          // コマンド形式
+          //   0 n xxx
+          //     n: 操作するDFPlayerの番号
+          //     xxx: 再生するファイル番号（0で停止）
+          Serial.println("DFPlayerMini command received");
+          switch (payload[0]) {
+            case 0: // 左側（BGM担当）
+              if (payload[1] == 0) {
+                MP3B.stop();
+                Serial.println("  Stop BGM");
+              }
+              else {
+                MP3B.play(payload[1]);
+                Serial.print("  Play BGM: ");
+                Serial.println(payload[1]);
+              }
+              break;
+            case 1: // 右側（効果音担当）
+              if (payloadLength >= 2) {
+                if (payload[1] == 0) {
+                  MP3J.stop();
+                  Serial.println("  Stop Sound Effect");
+                }
+                else {
+                  MP3J.play(payload[1]);
+                  Serial.print("  Play Sound Effect: ");
+                  Serial.println(payload[1]);
+                }
+              }
+              break;
+            default:
+              Serial.println("  Error: Invalid DFPlayer number");
+              break;
+          }
         }
-        Serial.println();
+        else {
+          char msg[20];
+          CAN0.sendMsgBuf(canId, 0, payloadLength, payload);
+          sprintf(msg, "Send --> 0x%03X ", canId);
+          Serial.print(msg);
+          sprintf(msg, "(%d) ", payloadLength);
+          Serial.print(msg);
+          for (int i = 0; i < payloadLength; i++) {
+            sprintf(msg, "0x%02X ", payload[i]);
+            Serial.print(msg);
+          }
+          Serial.println();
+        }
       }
       else {
         Serial.println("No valid values found");
