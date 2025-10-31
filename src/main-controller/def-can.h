@@ -36,6 +36,17 @@ const unsigned long SCOREBOARD_RX = 0x090; // 得点板
 const unsigned long LEDBOARD0_RX  = 0x091; // 30連LEDコントローラ
 
 // ----------------------------------------------------------------------
+/*
+  CAN通信のプロトコルについて
+  フォーマット
+    CAN_ID: 16bit, COMMAND: 8bit, PAYLOAD1: 8bit, PAYLOAD2: 8bit
+      CAN_ID: 各アイテムに割り当てられたID兼コマンド
+      COMMAND:  コマンド
+      PAYLOAD1: パラメータ1
+      PAYLOAD2: パラメータ2
+*/
+
+/// ----------------------------------------------------------------------
 // *** コマンド ***
 // アウトホール
 const byte OUTHOLE_TELEMETRY      = 0x00; // 待機中（ボールを打ち出した後の待機状態）

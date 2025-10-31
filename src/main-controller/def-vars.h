@@ -83,15 +83,3 @@ const byte DT_TIMEOUT[] = { // 秒
   20, // Stage 8
   10, // Stage 9
 };
-
-// ----------------------------------------------------------------------
-/*
-  CAN通信のプロトコルについて
-  フォーマット
-    CAN_ID: 16bit, COMMAND: 8bit, PAYLOAD1: 8bit, PAYLOAD2: 8bit
-      CAN_ID: 各アイテムに割り当てられたID兼コマンド
-      COMMAND:  コマンド
-      PAYLOAD1: パラメータ1
-      PAYLOAD2: パラメータ2
-*/
-
