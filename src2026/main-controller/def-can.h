@@ -14,8 +14,8 @@ const unsigned long OUTHOLE_TX    = 0x010; // アウトホール
 const unsigned long OUTHOLE_RX    = 0x110;
 const unsigned long EXTRABALL_TX  = 0x011; // エクストラボール
 const unsigned long EXTRABALL_RX  = 0x111;
-const unsigned long TIMERBOARD_TX = 0x020; // タイマー
-const unsigned long TIMERBOARD_RX = 0x120;
+const unsigned long TIMER7SEG_TX  = 0x020; // タイマー
+const unsigned long TIMER7SEG_RX  = 0x120;
 const unsigned long DTARGET0_TX   = 0x030; // 左ドロップターゲット
 const unsigned long DTARGET0_RX   = 0x130;
 const unsigned long DTARGET1_RX   = 0x131; // 中央ドロップターゲット
@@ -61,28 +61,27 @@ const unsigned long LEDBOARD_RX   = 0x191;
 // ----------------------------------------------------------------------
 // *** コマンド ***
 // 共通
+const byte ITEM_TELEMETRY = 0x00; // テレメトリー
 const byte SEND_YOUR_NAME = 0xff; // 名前要求
+const byte ITEM_RESET     = 0xaa; // ソフトウェアリセット
 // アウトホール
-const byte OUTHOLE_TELEMETRY      = 0x00; // テレメトリー
-const byte OUTHOLE_WAIT_START     = 0x01; // スタート待機中
-const byte OUTHOLE_START_GAME     = 0x02; // ゲーム開始（プレイ中：ボールを打ち出した状態）
-const byte OUTHOLE_DROP_BALL      = 0x04; // ボールが落ちた（ゲーム終了）
-const byte OUTHOLE_DROP_EXTRABALL = 0x08; // エクストラボールが落ちた
-const byte OUTHOLE_WAIT_BALL      = 0x10; // ボールが落ちてくるのを待て
-const byte OUTHOLE_WAIT_EXTRABALL = 0x20; // エクストラボールが落ちてくるのを待て
+const byte OUTHOLE_WAIT_START     = 0x01; // スタートボタン押下げ待ち
+const byte OUTHOLE_WAIT_BALL      = 0x02; // ボール落下待ち（通常ゲーム中）
+const byte OUTHOLE_WAIT_EXTRABALL = 0x04; // エクストラボール落下待ち（ボーナスゲーム中）
+const byte OUTHOLE_DROP_BALL      = 0x10; // ボールが落ちた（ゲーム終了）
+const byte OUTHOLE_DROP_EXTRABALL = 0x20; // エクストラボールが落ちた（ボーナスゲーム終了）
 // エクストラボール
-const byte EXTRABALL_TELEMETRY = 0x00; // テレメトリー
-const byte EXTRABALL_READY     = 0x01; // スタート待機中
+const byte EXTRABALL_READY     = 0x01; // エクストラボール待機中
+const byte EXTRABALL_SHOOTED   = 0x02; // エクストラボールが打ち出された
 const byte EXTRABALL_SHOOT     = 0x10; // エクストラボールを打ち出せ
 // タイマー
-const byte TIMER_TELEMETRY = 0x00; // テレメトリー
 const byte TIMER_START     = 0x01; // タイマー時間設定・開始
 const byte TIMER_STOP      = 0x02; // タイマー停止
 const byte TIMER_STAGE_NUM = 0x04; // ステージ番号
-const byte TIMER_COUNTDOWN = 0x10; // タイマー動作中
-const byte TIMER_TIMEUP    = 0x20; // タイマー時間切れ
+const byte TIMER_RUNNING   = 0x10; // タイマー動作中
+const byte TIMER_STANDBY   = 0x20; // タイマー待機中
+const byte TIMER_TIMEUP    = 0x40; // タイマー時間切れ
 // ドロップターゲット
-const byte DTARGET_TELEMETRY = 0x00; // テレメトリー
 const byte DTARGET_HIT       = 0x01; // ボールが当たった
 const byte DTARGET_LIFT      = 0x10; // ターゲットが上がっている・上げる
 const byte DTARGET_DROP      = 0x20; // ターゲットが下がっている・下げる

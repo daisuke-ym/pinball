@@ -45,22 +45,43 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
   }
 	Serial.println();
   */
+  // テレメトリー情報以外はシリアルに出力する
+  if (rxBuf[0] == SEND_YOUR_NAME) {
+    sprintf(msg, "0x%03X ", rxId);
+    Serial.print(msg);
+    for (int i = 0; i < len; i++) {
+      Serial.write(rxBuf[i]);
+    }
+    Serial.println();
+  }
+  else if (rxBuf[0] != 0x00) {
+    sprintf(msg, "0x%03X ", rxId);
+    Serial.print(msg);
+    for (int i = 0; i < len; i++) {
+      sprintf(msg, "%02x ", rxBuf[i]);
+      Serial.print(msg);
+    }
+    Serial.println();
+  }
 
   // 各アイテムごとのステータス表示
   switch (rxId) {
-    case TIMERBOARD_RX: // タイマー
+    case TIMER7SEG_RX: // タイマー
       LCD.setCursor(6, 2);
       switch (rxBuf[0]) {
-        case TIMER_TELEMETRY:
+        case ITEM_TELEMETRY:
           LCD.setCursor(6, 3);
           LCD.write(progressChar[timerProgressIndex]);
           timerProgressIndex = (timerProgressIndex + 1) % progressLen;
           break;
-        case TIMER_COUNTDOWN:
-          LCD.print("C");
+        case TIMER_RUNNING:
+          LCD.print("R"); // Running
           break;
         case TIMER_TIMEUP:
           LCD.print("U");
+          break;
+        case TIMER_STANDBY:
+          LCD.print("S"); // Standby
           break;
         default:
           LCD.print("?");
@@ -70,7 +91,7 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
     case DTARGET0_RX: // 左ドロップターゲット
       LCD.setCursor(10, 2);
       switch (rxBuf[0]) {
-        case DTARGET_TELEMETRY:
+        case ITEM_TELEMETRY:
           LCD.setCursor(10, 3);
           LCD.write(progressChar[dtarget0ProgressIndex]);
           dtarget0ProgressIndex = (dtarget0ProgressIndex + 1) % progressLen;
@@ -92,7 +113,7 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
     case DTARGET1_RX: // 中ドロップターゲット
       LCD.setCursor(9, 2);
       switch (rxBuf[0]) {
-        case DTARGET_TELEMETRY:
+        case ITEM_TELEMETRY:
           LCD.setCursor(9, 3);
           LCD.write(progressChar[dtarget1ProgressIndex]);
           dtarget1ProgressIndex = (dtarget1ProgressIndex + 1) % progressLen;
@@ -114,7 +135,7 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
     case DTARGET2_RX: // 右ドロップターゲット
       LCD.setCursor(8, 2);
       switch (rxBuf[0]) {
-        case DTARGET_TELEMETRY:
+        case ITEM_TELEMETRY:
           LCD.setCursor(8, 3);
           LCD.write(progressChar[dtarget2ProgressIndex]);
           dtarget2ProgressIndex = (dtarget2ProgressIndex + 1) % progressLen;
@@ -158,7 +179,7 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
     case STARGET_RX: // スタンダップターゲット
       LCD.setCursor(13, 3);
       switch (rxBuf[0]) {
-        case STARGET_TELEMETRY:
+        case ITEM_TELEMETRY:
           LCD.setCursor(12, 3);
           LCD.write(progressChar[stargetProgressIndex]);
           stargetProgressIndex = (stargetProgressIndex + 1) % progressLen;
@@ -175,7 +196,7 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
     case SLING0_RX: // 左スリングショット
       LCD.setCursor(18, 1);
       switch (rxBuf[0]) {
-        case SLING_TELEMETRY:
+        case ITEM_TELEMETRY:
           LCD.write(progressChar[slingshot0ProgressIndex]);
           slingshot0ProgressIndex = (slingshot0ProgressIndex + 1) % progressLen;
           break;
@@ -190,7 +211,7 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
     case SLING1_RX: // 右スリングショット
       LCD.setCursor(17, 1);
       switch (rxBuf[0]) {
-        case SLING_TELEMETRY:
+        case ITEM_TELEMETRY:
           LCD.write(progressChar[slingshot1ProgressIndex]);
           slingshot1ProgressIndex = (slingshot1ProgressIndex + 1) % progressLen;
           break;
@@ -205,7 +226,7 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
     case BUMPER0_RX: // 左バンパー
       LCD.setCursor(14, 1);
       switch (rxBuf[0]) {
-        case BUMPER_TELEMETRY:
+        case ITEM_TELEMETRY:
           LCD.write(progressChar[bumper0ProgressIndex]);
           bumper0ProgressIndex = (bumper0ProgressIndex + 1) % progressLen;
           break;
@@ -220,7 +241,7 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
     case BUMPER1_RX: // 中バンパー
       LCD.setCursor(13, 1);
       switch (rxBuf[0]) {
-        case BUMPER_TELEMETRY:
+        case ITEM_TELEMETRY:
           LCD.write(progressChar[bumper1ProgressIndex]);
           bumper1ProgressIndex = (bumper1ProgressIndex + 1) % progressLen;
           break;
@@ -235,7 +256,7 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
     case BUMPER2_RX: // 右バンパー
       LCD.setCursor(12, 1);
       switch (rxBuf[0]) {
-        case BUMPER_TELEMETRY:
+        case ITEM_TELEMETRY:
           LCD.write(progressChar[bumper2ProgressIndex]);
           bumper2ProgressIndex = (bumper2ProgressIndex + 1) % progressLen;
           break;
@@ -250,7 +271,7 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
     case BUMPER3_RX: // 上バンパー
       LCD.setCursor(15, 1);
       switch (rxBuf[0]) {
-        case BUMPER_TELEMETRY:
+        case ITEM_TELEMETRY:
           LCD.write(progressChar[bumper3ProgressIndex]);
           bumper3ProgressIndex = (bumper3ProgressIndex + 1) % progressLen;
           break;
@@ -265,7 +286,7 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
     case BALLSEP_RX: // ボールセパレータ
       LCD.setCursor(16, 3);
       switch (rxBuf[0]) {
-        case BALLSEP_TELEMETRY:
+        case ITEM_TELEMETRY:
           LCD.setCursor(15, 3);
           LCD.write(progressChar[ballsepProgressIndex]);
           ballsepProgressIndex = (ballsepProgressIndex + 1) % progressLen;
@@ -282,7 +303,7 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
     case BALLTHRU_RX: // ボールスルー
       LCD.setCursor(19, 3);
       switch (rxBuf[0]) {
-        case BALLTHRU_TELEMETRY:
+        case ITEM_TELEMETRY:
           LCD.setCursor(18, 3);
           LCD.write(progressChar[ballthruProgressIndex]);
           ballthruProgressIndex = (ballthruProgressIndex + 1) % progressLen;
@@ -299,22 +320,25 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
     case OUTHOLE_RX: // アウトホール
       LCD.setCursor(0, 2);
       switch (rxBuf[0]) {
-        case OUTHOLE_TELEMETRY:
+        case ITEM_TELEMETRY:
           LCD.setCursor(0, 3);
           LCD.write(progressChar[outholeProgressIndex]);
           outholeProgressIndex = (outholeProgressIndex + 1) % progressLen;
           break;
         case OUTHOLE_WAIT_START:
-          LCD.print("W");
+          LCD.print("S"); // Standby (Waiting for start)
           break;
-        case OUTHOLE_START_GAME:
-          LCD.print("P");
+        case OUTHOLE_WAIT_BALL:
+          LCD.print("N"); // Normal game
+          break;
+        case OUTHOLE_WAIT_EXTRABALL:
+          LCD.print("B"); // Bonus game
           break;
         case OUTHOLE_DROP_BALL:
-          LCD.print("D");
+          LCD.print("D"); // Drop ball
           break;
         case OUTHOLE_DROP_EXTRABALL:
-          LCD.print("E");
+          LCD.print("E"); // drop Extra ball
           break;
         default:
           LCD.print("?");
@@ -324,16 +348,16 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
     case EXTRABALL_RX: // エクストラボール
       LCD.setCursor(2, 2);
       switch (rxBuf[0]) {
-        case EXTRABALL_TELEMETRY:
+        case ITEM_TELEMETRY:
           LCD.setCursor(2, 3);
           LCD.write(progressChar[extraballProgressIndex]);
           extraballProgressIndex = (extraballProgressIndex + 1) % progressLen;
           break;
         case EXTRABALL_READY:
-          LCD.print("R");
-          break;
-        case EXTRABALL_SHOOT:
           LCD.print("S");
+          break;
+        case EXTRABALL_SHOOTED:
+          LCD.print("O");
           break;
         default:
           LCD.print("?");
