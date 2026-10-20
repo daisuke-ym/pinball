@@ -11,10 +11,10 @@
 //#define BALLSEP
 //#define BALLTHRU
 //#define BUMPER
-//#define JUMPER
+#define JUMPER
 //#define STARGET
 //#define DTARGET
-#define SLING
+//#define SLING
 //#define FLIPPER
 //#define OUTHOLE
 //#define EXTRABALL
@@ -53,7 +53,9 @@ const byte LEDPIN = 9;
   const byte NUMPIXELS = 1;
 #elif defined(BALLSEP) || defined(BALLTHRU) || defined(STARGET)
   const byte NUMPIXELS = 3;
-#elif defined(JUMPER) || defined(TIMER7SEG)
+#elif defined(JUMPER)
+  const byte NUMPIXELS = 8;
+#elif defined(TIMER7SEG)
   const byte NUMPIXELS = 12;
 #elif defined(LED30)
   const byte NUMPIXELS = 30;
@@ -203,6 +205,9 @@ void setup() {
   #ifdef SLING
     MYID = SLING0_TX;
   #endif
+  #ifdef JUMPER
+    MYID = JUMPER_TX;
+  #endif
   #if defined(DTARGET) || defined(BUMPER) || defined(SLING) || defined(FLIPPER)
     MYID += mapAnalogValueToIndex2(analogRead(DIPH)) << 2;
     MYID += mapAnalogValueToIndex2(analogRead(DIPL));
@@ -283,6 +288,10 @@ void loop() {
 
   #ifdef SLING
     loopSlingShot();
+  #endif
+  
+  #ifdef JUMPER
+    loopJumper();
   #endif
 
   // テレメトリー送信
