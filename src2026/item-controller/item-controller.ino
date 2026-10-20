@@ -8,7 +8,7 @@
 
 // ----------------------------------------------------------------------
 // 書き込み対象のアイテムだけコメントアウトする
-#define BALLSEP
+//#define BALLSEP
 //#define BALLTHRU
 //#define BUMPER
 //#define JUMPER
@@ -19,7 +19,7 @@
 //#define OUTHOLE
 //#define EXTRABALL
 //#define TIMER7SEG
-//#define LED30
+#define LED30
 //#define SCOREBOARD
 
 // ----------------------------------------------------------------------
@@ -208,6 +208,9 @@ void setup() {
   #ifdef JUMPER
     MYID = JUMPER_TX;
   #endif
+  #ifdef LED30
+    MYID = LED30_TX;
+  #endif
   #if defined(BALLSEP) || defined(BALLTHRU)
     MYID = BALLSEP_TX;
   #endif
@@ -299,6 +302,10 @@ void loop() {
 
   #if defined(BALLSEP) || defined(BALLTHRU)
     loopBallSep();
+  #endif
+
+  #ifdef LED30
+    loopLED30();
   #endif
 
   // テレメトリー送信

@@ -44,8 +44,8 @@ const unsigned long STARGET_TX    = 0x080; // スタンダップターゲット
 const unsigned long STARGET_RX    = 0x180;
 const unsigned long SCOREBOARD_TX = 0x090; // 得点板
 const unsigned long SCOREBOARD_RX = 0x190;
-const unsigned long LEDBOARD_TX   = 0x091; // 30連LED
-const unsigned long LEDBOARD_RX   = 0x191;
+const unsigned long LED30_TX      = 0x091; // 30連LED
+const unsigned long LED30_RX      = 0x191;
 
 // ----------------------------------------------------------------------
 /*
@@ -104,13 +104,6 @@ const byte SCOREBOARD_SCORE     = 0x01; // 得点表示
 const byte SCOREBOARD_CLEAR     = 0x02; // 得点クリア
 const byte SCOREBOARD_CLEAR_HS  = 0x04; // ハイスコアクリア
 // 30連LED
-const byte LED30_PAT1 = 0x01; // パターン1
-const byte LED30_PAT2 = 0x02; // パターン2
-const byte LED30_PAT3 = 0x04; // パターン3
-const byte LED30_PAT4 = 0x08; // パターン4
-const byte LED30_PAT5 = 0x10; // パターン5
-const byte LED30_PAT6 = 0x20; // パターン6
-const byte LED30_PAT7 = 0x40; // パターン7
-const byte LED30_PAT8 = 0x80; // パターン8
+const byte LED30_PATTERN = 0x01; // 点灯パターン指定
 
 #endif // DEF_CAN_H
