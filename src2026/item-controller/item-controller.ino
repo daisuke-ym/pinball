@@ -8,10 +8,10 @@
 
 // ----------------------------------------------------------------------
 // 書き込み対象のアイテムだけコメントアウトする
-//#define BALLSEP
+#define BALLSEP
 //#define BALLTHRU
 //#define BUMPER
-#define JUMPER
+//#define JUMPER
 //#define STARGET
 //#define DTARGET
 //#define SLING
@@ -208,7 +208,10 @@ void setup() {
   #ifdef JUMPER
     MYID = JUMPER_TX;
   #endif
-  #if defined(DTARGET) || defined(BUMPER) || defined(SLING) || defined(FLIPPER)
+  #if defined(BALLSEP) || defined(BALLTHRU)
+    MYID = BALLSEP_TX;
+  #endif
+  #if defined(DTARGET) || defined(BUMPER) || defined(SLING) || defined(FLIPPER) || defined(BALLSEP) || defined(BALLTHRU)
     MYID += mapAnalogValueToIndex2(analogRead(DIPH)) << 2;
     MYID += mapAnalogValueToIndex2(analogRead(DIPL));
   #endif
@@ -292,6 +295,10 @@ void loop() {
   
   #ifdef JUMPER
     loopJumper();
+  #endif
+
+  #if defined(BALLSEP) || defined(BALLTHRU)
+    loopBallSep();
   #endif
 
   // テレメトリー送信
