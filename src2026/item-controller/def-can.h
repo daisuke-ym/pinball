@@ -86,39 +86,31 @@ const byte DTARGET_HIT       = 0x01; // ボールが当たった
 const byte DTARGET_LIFT      = 0x10; // ターゲットが上がっている・上げる
 const byte DTARGET_DROP      = 0x20; // ターゲットが下がっている・下げる
 // ジャンパー
-const byte JUMPER_TELEMETRY = 0x00; // テレメトリー
 const byte JUMPER_SENSE     = 0x01; // ボールを検知した
 const byte JUMPER_SHOOT     = 0x02; // ボールを打ち上げた
 const byte JUMPER_DROP      = 0x04; // ボールが落ちた
 // ボールセパレーター
-const byte BALLSEP_TELEMETRY = 0x00; // テレメトリー
-const byte BALLSEP_SENSE     = 0x01; // ボールを検知した
+const byte BALLSEP_SENSE = 0x01; // ボールを検知した
 // ボールスルー
-const byte BALLTHRU_TELEMETRY = 0x00; // テレメトリー
-const byte BALLTHRU_SENSE     = 0x01; // ボールを検知した
+const byte BALLTHRU_SENSE = 0x01; // ボールを検知した
 // バンパー
-const byte BUMPER_TELEMETRY = 0x00; // テレメトリー
-const byte BUMPER_HIT       = 0x01; // ボールが当たった
+const byte BUMPER_HIT = 0x01; // ボールが当たった
 // スリング
-const byte SLING_TELEMETRY = 0x00; // テレメトリー
-const byte SLING_SENSE     = 0x01; // ボールを検知した
+const byte SLING_SENSE = 0x01; // ボールを検知した
 // スタンダップターゲット
-const byte STARGET_TELEMETRY = 0x00; // テレメトリー
-const byte STARGET_HIT       = 0x01; // ボールが当たった
+const byte STARGET_HIT = 0x01; // ボールが当たった
 // 得点板
-const byte SCOREBOARD_TELEMETRY = 0x00; // テレメトリー
 const byte SCOREBOARD_SCORE     = 0x01; // 得点表示
 const byte SCOREBOARD_CLEAR     = 0x02; // 得点クリア
 const byte SCOREBOARD_CLEAR_HS  = 0x04; // ハイスコアクリア
 // 30連LED
-const byte LED30_TELEMETRY = 0x00; // テレメトリー
-const byte LED30_PAT1      = 0x01; // パターン1
-const byte LED30_PAT2      = 0x02; // パターン2
-const byte LED30_PAT3      = 0x04; // パターン3
-const byte LED30_PAT4      = 0x08; // パターン4
-const byte LED30_PAT5      = 0x10; // パターン5
-const byte LED30_PAT6      = 0x20; // パターン6
-const byte LED30_PAT7      = 0x40; // パターン7
-const byte LED30_PAT8      = 0x80; // パターン8
+const byte LED30_PAT1 = 0x01; // パターン1
+const byte LED30_PAT2 = 0x02; // パターン2
+const byte LED30_PAT3 = 0x04; // パターン3
+const byte LED30_PAT4 = 0x08; // パターン4
+const byte LED30_PAT5 = 0x10; // パターン5
+const byte LED30_PAT6 = 0x20; // パターン6
+const byte LED30_PAT7 = 0x40; // パターン7
+const byte LED30_PAT8 = 0x80; // パターン8
 
 #endif // DEF_CAN_H

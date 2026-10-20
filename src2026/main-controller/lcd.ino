@@ -157,7 +157,7 @@ void disp_lcd_can_message(unsigned long rxId, uint8_t len, uint8_t *rxBuf) {
     case JUMPER_RX: // ジャンパー
       LCD.setCursor(4, 2);
       switch (rxBuf[0]) {
-        case JUMPER_TELEMETRY:
+        case ITEM_TELEMETRY:
           LCD.setCursor(4, 3);
           LCD.write(progressChar[jumperProgressIndex]);
           jumperProgressIndex = (jumperProgressIndex + 1) % progressLen;
