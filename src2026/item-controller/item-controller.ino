@@ -10,7 +10,7 @@
 // 書き込み対象のアイテムだけコメントアウトする
 //#define BALLSEP
 //#define BALLTHRU
-//#define BUMPER
+#define BUMPER
 //#define JUMPER
 //#define STARGET
 //#define DTARGET
@@ -18,7 +18,7 @@
 //#define FLIPPER
 //#define OUTHOLE
 //#define EXTRABALL
-#define TIMER7SEG
+//#define TIMER7SEG
 //#define LED30
 //#define SCOREBOARD
 
@@ -197,6 +197,9 @@ void setup() {
   #ifdef STARGET
     MYID = STARGET_TX;
   #endif
+  #ifdef BUMPER
+    MYID = BUMPER0_TX;
+  #endif
   #if defined(DTARGET) || defined(BUMPER) || defined(SLING) || defined(FLIPPER)
     MYID += mapAnalogValueToIndex2(analogRead(DIPH)) << 2;
     MYID += mapAnalogValueToIndex2(analogRead(DIPL));
@@ -269,6 +272,10 @@ void loop() {
 
   #ifdef EXTRABALL
     loopExtraBall();
+  #endif
+
+  #ifdef BUMPER
+    loopBumper();
   #endif
 
   // テレメトリー送信
