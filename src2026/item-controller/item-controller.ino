@@ -19,14 +19,15 @@
 //#define OUTHOLE
 //#define EXTRABALL
 //#define TIMER7SEG
-#define LED30
-//#define SCOREBOARD
+//#define LED30
+#define SCOREBOARD
 
 // ----------------------------------------------------------------------
 #include <mcp_can.h>
 #include <SPI.h>
 #include <Servo_megaTinyCore.h>
 #include <tinyNeoPixel.h>
+#include <EEPROM.h>
 #include "def-can.h"
 
 // ----------------------------------------------------------------------
@@ -137,11 +138,34 @@ const byte DIGITS[] = {
   0b11111111, // blank
   0b10110111, // =
 };
+// 7セグのフォントデータ（得点板用）
+const byte SC_DIGITS[] = {
+  // DP G F E D C B A
+  // 正論理
+  0b00111111, // 0
+  0b00000110, // 1
+  0b01011011, // 2
+  0b01001111, // 3
+  0b01100110, // 4
+  0b01101101, // 5
+  0b01111101, // 6
+  0b00000111, // 7
+  0b01111111, // 8
+  0b01101111, // 9
+  0b00000000, // blank
+};
 
 // ----------------------------------------------------------------------
 const int DEBOUNCE = 50; // チャタリング無視時間(ms)
 const int TARGET_DEBOUNCE = 2; // フォトインタラプタを使ったセンサー用のチャタリング無視時間(ms)
 const int DEADTIME = 300; // 一度センサが検知してから，次に検知するまでの無効時間(ms)
+
+// ----------------------------------------------------------------------
+// 得点板用グローバル変数
+const byte MEMPTR = 0; // ハイスコアを保存するEEPROMの先頭アドレス
+unsigned long SCORE = 0;
+unsigned long TARGET = 0;
+unsigned long HIGHSCORE = 0;
 
 // ----------------------------------------------------------------------
 void setup() {
@@ -214,6 +238,9 @@ void setup() {
   #if defined(BALLSEP) || defined(BALLTHRU)
     MYID = BALLSEP_TX;
   #endif
+  #ifdef SCOREBOARD
+    MYID = SCOREBOARD_TX;
+  #endif
   #if defined(DTARGET) || defined(BUMPER) || defined(SLING) || defined(FLIPPER) || defined(BALLSEP) || defined(BALLTHRU)
     MYID += mapAnalogValueToIndex2(analogRead(DIPH)) << 2;
     MYID += mapAnalogValueToIndex2(analogRead(DIPL));
@@ -245,9 +272,23 @@ void setup() {
   CAN0.setMode(MCP_ANY);
 
   // 7segLEDの設定
-  #if defined(TIMER7SEG) || defined(SCOREBOARD)
+  #if defined(TIMER7SEG)
     analogWrite(OE, 10);
     disp7seg(0);
+  #endif
+  #if defined(SCOREBOARD)
+    /* ATtiny1616ではbootloaderを書き込んでないとEEPROMが使えないみたい
+    // EEPROMからハイスコアを読み込む
+    HIGHSCORE = EEPROM.read(MEMPTR) +
+               (EEPROM.read(MEMPTR + 1) << 8) +
+               (EEPROM.read(MEMPTR + 2) << 16) +
+               (EEPROM.read(MEMPTR + 3) << 24);
+    */
+    HIGHSCORE = 0;
+    Serial.print("HIGHSCORE: ");
+    Serial.println(HIGHSCORE);
+    analogWrite(OE, 10);
+    dispScore7seg(0);
   #endif
 
   // サーボ
@@ -306,6 +347,10 @@ void loop() {
 
   #ifdef LED30
     loopLED30();
+  #endif
+
+  #ifdef SCOREBOARD
+    loopScoreBoard();
   #endif
 
   // テレメトリー送信
