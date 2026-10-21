@@ -109,5 +109,7 @@ const byte SCOREBOARD_CLEAR     = 0x02; // 得点クリア
 const byte SCOREBOARD_CLEAR_HS  = 0x04; // ハイスコアクリア
 // 30連LED
 const byte LED30_PATTERN = 0x01; // 点灯パターン指定
+// フリッパー
+const byte FLIPPER_OVERLOAD = 0x10; // フリッパー過負荷
 
 #endif // DEF_CAN_H
