@@ -46,6 +46,10 @@ const unsigned long SCOREBOARD_TX = 0x090; // 得点板
 const unsigned long SCOREBOARD_RX = 0x190;
 const unsigned long LED30_TX      = 0x091; // 30連LED
 const unsigned long LED30_RX      = 0x191;
+const unsigned long FLIPPER0_TX   = 0x0f0; // 左フリッパー
+const unsigned long FLIPPER0_RX   = 0x1f0;
+const unsigned long FLIPPER1_TX   = 0x0f1; // 右フリッパー
+const unsigned long FLIPPER1_RX   = 0x1f1;
 
 // ----------------------------------------------------------------------
 /*

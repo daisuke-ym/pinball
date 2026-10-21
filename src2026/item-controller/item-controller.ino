@@ -15,12 +15,12 @@
 //#define STARGET
 //#define DTARGET
 //#define SLING
-//#define FLIPPER
+#define FLIPPER
 //#define OUTHOLE
 //#define EXTRABALL
 //#define TIMER7SEG
 //#define LED30
-#define SCOREBOARD
+//#define SCOREBOARD
 
 // ----------------------------------------------------------------------
 #include <mcp_can.h>
@@ -241,6 +241,9 @@ void setup() {
   #ifdef SCOREBOARD
     MYID = SCOREBOARD_TX;
   #endif
+  #ifdef FLIPPER
+    MYID = FLIPPER0_TX;
+  #endif
   #if defined(DTARGET) || defined(BUMPER) || defined(SLING) || defined(FLIPPER) || defined(BALLSEP) || defined(BALLTHRU)
     MYID += mapAnalogValueToIndex2(analogRead(DIPH)) << 2;
     MYID += mapAnalogValueToIndex2(analogRead(DIPL));
@@ -351,6 +354,10 @@ void loop() {
 
   #ifdef SCOREBOARD
     loopScoreBoard();
+  #endif
+
+  #ifdef FLIPPER
+    loopFlipper();
   #endif
 
   // テレメトリー送信
