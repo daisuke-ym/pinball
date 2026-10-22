@@ -5,7 +5,7 @@
 #define HUE60  60 // 色相の変化度（細目）
 // ----------------------------------------------------------------------
 void loopLED30() {
-  static uint8_t pattern = 1; // 点灯パターン
+  static uint8_t pattern = 4; // 点灯パターン
 
   // CANメッセージ受信処理
   if (digitalRead(CAN0_INT) == LOW) {
@@ -19,6 +19,9 @@ void loopLED30() {
 
   // 点灯パターンの切り替え
   switch (pattern) {
+    case 0:
+      ledPattern0();
+      break;
     case 1:
       ledPattern1();
       break;
@@ -29,16 +32,16 @@ void loopLED30() {
       ledPattern3();
       break;
     case 4:
-      rainbow_down2up(30, 2);
+      rainbow_down2up(30, 1);
       break;
     case 5:
-      rainbow_up2down(30, 2);
+      rainbow_up2down(30, 1);
       break;
     case 6:
-      rainbow_left2right(30, 2);
+      rainbow_left2right(30, 1);
       break;
     default:
-      ledPattern1();
+      rainbow_down2up(30, 1);
       break;
   }
 }

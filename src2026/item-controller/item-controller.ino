@@ -15,11 +15,11 @@
 //#define STARGET
 //#define DTARGET
 //#define SLING
-#define FLIPPER
+//#define FLIPPER
 //#define OUTHOLE
 //#define EXTRABALL
 //#define TIMER7SEG
-//#define LED30
+#define LED30
 //#define SCOREBOARD
 
 // ----------------------------------------------------------------------
