@@ -8,11 +8,13 @@ void loopExtraBall() {
   static int sensor2_state = HIGH;
   static uint8_t shootNextPos = 0; // 0:待機    1:次の位置に打ち出せ
   static unsigned long shootNextPosTime = 0; // 打ち出す時間
+  const unsigned long oneshot = 15; // ソレノイド動作時間
 
   // ボールセンサ1が検知したら次の位置までボールを打ち出す
   if (digitalRead(SENSOR1) == LOW) {
     delay(DEBOUNCE);
-    if (digitalRead(SENSOR1) == LOW) {
+    if (digitalRead(SENSOR1) == LOW && shootNextPos == 0) {
+      Serial.println("SENSOR1 detected");
       shootNextPos = 1;
       shootNextPosTime = millis() + 2000; // 2秒後に次の位置に打ち出す
     }
@@ -20,9 +22,10 @@ void loopExtraBall() {
   // 時間が来たら次の位置に打ち出す
   // delay()で待つと他の処理が止まってしまうので、タイマーで管理する
   if (shootNextPos == 1 && millis() > shootNextPosTime) {
+    Serial.println("Shooting next position");
     shootNextPos = 0;
     digitalWrite(SOL1, HIGH);
-    delay(10);
+    delay(oneshot);
     digitalWrite(SOL1, LOW);
   }
 
@@ -50,7 +53,7 @@ void loopExtraBall() {
     if (CANID == MYID && RX_BUF[0] == EXTRABALL_SHOOT) {
       // エクストラボールを打ち出す
       digitalWrite(SOL2, HIGH);
-      delay(10);
+      delay(oneshot);
       digitalWrite(SOL2, LOW);
       CAN_DATA[0] = EXTRABALL_SHOOT;
       CAN0.sendMsgBuf(MYID + 0x100, 0, 1, CAN_DATA);
