@@ -212,8 +212,8 @@ void setup() {
   delay(500);
 
   // DIPスイッチを読み込んでMYIDを設定（後のフィルタリングに使う）
-  // DIPスイッチは2個セットで1ビットとして扱う
-  // LLLLLLLL: 0    LLLLLLHH: 1    LLLLHHLL: 2    LLLLHHHH: 3
+  // DIPスイッチは4個セットで1ビットとして扱う
+  // LLLLLLLL: 0    LLLLHHHH: 1    HHHHLLLL: 2    HHHHHHHH: 3
   // 1種類しかないアイテムはMYIDを固定する
   #ifdef TIMER7SEG
     MYID = TIMER7SEG_TX;
@@ -252,8 +252,17 @@ void setup() {
     MYID = FLIPPER0_TX;
   #endif
   #if defined(DTARGET) || defined(BUMPER) || defined(SLING) || defined(FLIPPER) || defined(BALLSEP) || defined(BALLTHRU)
-    MYID += mapAnalogValueToIndex2(analogRead(DIPH)) << 2;
-    MYID += mapAnalogValueToIndex2(analogRead(DIPL));
+    Serial.print("H L: ");
+    Serial.print(analogRead(DIPH));
+    Serial.print(" ");
+    Serial.print(analogRead(DIPL));
+    Serial.println();
+    if (analogRead(DIPH) < 512) {
+      MYID += 0b10;
+    }
+    if (analogRead(DIPL) < 512) {
+      MYID += 0b01;
+    }
   #endif
   Serial.print("MYID: 0x");
   Serial.print(MYID, HEX);
