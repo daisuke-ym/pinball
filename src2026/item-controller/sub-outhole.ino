@@ -22,7 +22,7 @@ void loopOuthole() {
       ebState = 0; // ゲーム開始時はエクストラボール待機中に設定
       // スタート位置にボールを打ち出す
       digitalWrite(SOL1, HIGH);
-      delay(10);
+      delay(20);
       digitalWrite(SOL1, LOW);
     }
   }
@@ -37,6 +37,7 @@ void loopOuthole() {
         CAN_DATA[0] = OUTHOLE_DROP_BALL;
         CAN0.sendMsgBuf(MYID + 0x100, 0, 1, CAN_DATA);
         // スタート側にボールを流す
+        delay(1000);
         SV.write(SV_START);
         servoReturnTime = millis() + servoReturnDelay;
       }
@@ -47,6 +48,7 @@ void loopOuthole() {
         CAN_DATA[0] = OUTHOLE_DROP_EXTRABALL;
         CAN0.sendMsgBuf(MYID + 0x100, 0, 1, CAN_DATA);
         // エクストラボール側にボールを流す
+        delay(1000);
         SV.write(SV_EXTRA);
         servoReturnTime = millis() + servoReturnDelay;
       }
