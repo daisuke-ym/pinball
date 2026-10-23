@@ -14,12 +14,12 @@
 //#define JUMPER
 //#define STARGET
 //#define DTARGET
-//#define SLING
+#define SLING
 //#define FLIPPER
 //#define OUTHOLE
 //#define EXTRABALL
 //#define TIMER7SEG
-#define LED30
+//#define LED30
 //#define SCOREBOARD
 
 // ----------------------------------------------------------------------
@@ -192,6 +192,13 @@ void setup() {
   #else
     pinMode(SENSOR2, INPUT_PULLUP);
     pinMode(SENSOR3, INPUT_PULLUP);
+  #endif
+  #if defined(BUMPER) || defined(JUMPER) || defined(SLING)
+    pinMode(SOL1, OUTPUT);
+  #endif
+  #if defined(FLIPPER) || defined(OUTHOLE) || defined(EXTRABALL)
+    pinMode(SOL1, OUTPUT);
+    pinMode(SOL2, OUTPUT);
   #endif
   // アナログ入力の基準電圧変更
   analogReference(INTERNAL2V5);
@@ -461,8 +468,8 @@ unsigned long mapAnalogValueToIndex(int analogValue) {
 // ----------------------------------------------------------------------
 // DIPスイッチから読み込んだ値を0-15に変換する（アドレス確定用）関数（中間値判定版）
 unsigned long mapAnalogValueToIndex2(int analogValue) {
-  //Serial.print("Analog Value: ");
-  //Serial.println(analogValue);
+  Serial.print("Analog Value: ");
+  Serial.println(analogValue);
 
   if (analogValue >= ((VRMAP2[0] + VRMAP2[1]) / 2 + 1)) return 0;
   for (int i = 1; i < 3; i++) {
