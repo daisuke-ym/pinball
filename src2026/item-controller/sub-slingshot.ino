@@ -8,6 +8,8 @@ void loopSlingShot() {
   static int ss = step; // 明度の変化度
   static unsigned long led_update = 0;
   const unsigned long led_update_period = 50;
+  const unsigned long oneshot = 15;
+  const unsigned long deadtime = 500;
 
   if (digitalRead(SENSOR1) == LOW) {
     delay(DEBOUNCE);
@@ -21,9 +23,9 @@ void loopSlingShot() {
       LEDHSB(0, hue, SAT, bri);
       // ソレノイドを動作
       digitalWrite(SOL1, HIGH);
-      delay(10);
+      delay(oneshot);
       digitalWrite(SOL1, LOW);
-      delay(DEADTIME);
+      delay(deadtime);
       //while (digitalRead(SENSOR1) == LOW) {
         // wait for release SENSOR1
       //}
