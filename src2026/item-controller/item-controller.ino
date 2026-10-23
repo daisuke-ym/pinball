@@ -8,7 +8,7 @@
 
 // ----------------------------------------------------------------------
 // 書き込み対象のアイテムだけコメントアウトする
-//#define BALLSEP
+#define BALLSEP
 //#define BALLTHRU
 //#define BUMPER
 //#define JUMPER
@@ -242,8 +242,11 @@ void setup() {
   #ifdef LED30
     MYID = LED30_TX;
   #endif
-  #if defined(BALLSEP) || defined(BALLTHRU)
+  #if defined(BALLSEP)
     MYID = BALLSEP_TX;
+  #endif
+  #if defined(BALLTHRU)
+    MYID = BALLTHRU_TX;
   #endif
   #ifdef SCOREBOARD
     MYID = SCOREBOARD_TX;
