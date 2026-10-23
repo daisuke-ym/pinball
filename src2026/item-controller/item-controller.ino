@@ -14,7 +14,7 @@
 //#define JUMPER
 //#define STARGET
 //#define DTARGET
-#define SLING
+//#define SLING
 //#define FLIPPER
 //#define OUTHOLE
 //#define EXTRABALL

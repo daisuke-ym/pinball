@@ -11,9 +11,11 @@ void loopFlipper() {
   static byte recentCountSize = 0;
   const byte recentCountMax = 5;
   static float averageCount = 0;
-  const float overLoadAverage = 3.0; // この回数を超えると過負荷とする
+  const float overLoadAverage = 7.0; // この回数を超えると過負荷とする
+  const unsigned long coolingTime = 3000; // 過負荷になったとき停止する時間(ms)
   const unsigned long reportPeriod = 1000; // ON/OFF回数報告間隔(ms)
-  const unsigned int oneshot = 10;
+  const unsigned int oneshot = 15;
+  const unsigned int deadtime = 50;
   static int hue = 0;
   static int bri = 100; // 輝度
   static uint8_t step = 5; // 輝度の変化量
@@ -44,7 +46,7 @@ void loopFlipper() {
       digitalWrite(SOL1, HIGH);
       delay(oneshot);
       digitalWrite(SOL1, LOW);
-      delay(DEADTIME);
+      delay(deadtime);
     }
     else {
       // フリッパー下げ
@@ -52,7 +54,7 @@ void loopFlipper() {
       digitalWrite(SOL2, HIGH);
       delay(oneshot);
       digitalWrite(SOL2, LOW);
-      delay(DEADTIME);
+      delay(deadtime);
     }
   }
 
@@ -101,7 +103,8 @@ void loopFlipper() {
       recentCounts[i] = 1;
     }
     // LEDを点滅させて警告する（この間は操作無効）
-    for (byte i = 0; i < 25; i++) {
+    unsigned long coolingStartedAt = millis();
+    while (millis() - coolingStartedAt < coolingTime) {
       LEDHSB(0, LED_RED, SAT, bri);
       delay(100);
       LEDHSB(0, LED_RED, SAT, 0);
