@@ -14,8 +14,8 @@ void loopFlipper() {
   const float overLoadAverage = 7.0; // この回数を超えると過負荷とする
   const unsigned long coolingTime = 3000; // 過負荷になったとき停止する時間(ms)
   const unsigned long reportPeriod = 1000; // ON/OFF回数報告間隔(ms)
-  const unsigned int oneshot = 15;
-  const unsigned int deadtime = 50;
+  const unsigned int oneshot = 50;
+  const unsigned int deadtime = 30;
   static int hue = 0;
   static int bri = 100; // 輝度
   static uint8_t step = 5; // 輝度の変化量
