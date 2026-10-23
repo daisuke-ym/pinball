@@ -50,9 +50,9 @@ void loopFlipper() {
       // フリッパー下げ
       digitalWrite(SOL1, LOW);
       digitalWrite(SOL2, HIGH);
-      delay(oneshot + 5);
+      delay(oneshot);
       digitalWrite(SOL2, LOW);
-      delay(DEADTIME - 5);
+      delay(DEADTIME);
     }
   }
 
