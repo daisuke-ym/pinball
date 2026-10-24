@@ -97,7 +97,7 @@ void setup() {
   if (MP3B.begin(Serial1)) {
     Serial.println("MP3B initialized successfully.");
     MP3B.setTimeOut(100);
-    MP3B.volume(5);
+    MP3B.volume(12);
     //MP3B.play(1);
   }
   else {
@@ -106,7 +106,7 @@ void setup() {
   if (MP3J.begin(Serial2)) {
     Serial.println("MP3J initialized successfully.");
     MP3J.setTimeOut(100);
-    MP3J.volume(10);
+    MP3J.volume(20);
     //MP3J.play(1);
   }
   else {
