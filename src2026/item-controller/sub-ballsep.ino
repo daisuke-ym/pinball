@@ -1,6 +1,33 @@
 #ifdef BALLSEP
 
-// ボールセパレーターとボールスルーの制御コードは同じ
+/*
+  ボールセパレーターとボールスルーの制御コードは同じ
+
+  ボールの速度が速いとdigitalRead()では検知が間に合わないことがあるので、
+  割り込みで検知するようにしているが、速度によっては検知できない時がある。
+  センサー回路の応答限界かもしれない。
+*/
+
+// ----------------------------------------------------------------------
+volatile bool Sensor1Detected = false;
+volatile bool Sensor2Detected = false;
+volatile bool Sensor3Detected = false;
+
+// ----------------------------------------------------------------------
+ISR(PORTA_PORT_vect) {
+  uint8_t flags = PORTA.INTFLAGS;
+  if (flags & PIN5_bm) {
+    Sensor1Detected = true;
+  }
+  if (flags & PIN6_bm) {
+    Sensor2Detected = true;
+  }
+  if (flags & PIN7_bm) {
+    Sensor3Detected = true;
+  }
+  PORTA.INTFLAGS = flags;
+}
+
 // ----------------------------------------------------------------------
 void loopBallSep() {
   static int hue[3] = {random(360), random(360), random(360)}; // 色相
@@ -10,53 +37,38 @@ void loopBallSep() {
   static unsigned long led_update = 0;
   const unsigned long led_update_period = 50;
 
-  if (digitalRead(SENSOR1) == LOW) {
-    delay(DEBOUNCE);
-    if (digitalRead(SENSOR1) == LOW) {
-      // CAN通信でセンサ感知を通知
-      CAN_DATA[0] = BALLSEP_SENSE;
-      CAN_DATA[1] = 0x01;
-      CAN0.sendMsgBuf(MYID + 0x100, 0, 2, CAN_DATA);
-      // LEDの制御（乱数で色を変えて，輝度を最大にする）
-      hue[0] = random(360);
-      bri[0] = 100;
-      LEDHSB(0, hue[0], SAT, bri[0]);
-      while (digitalRead(SENSOR1) == LOW) {
-        // wait for release SENSOR1
-      }
-    }
+  if (Sensor1Detected) {
+    CAN_DATA[0] = BALLSEP_SENSE;
+    CAN_DATA[1] = 0x01;
+    CAN0.sendMsgBuf(MYID + 0x100, 0, 2, CAN_DATA);
+    hue[0] = random(360);
+    bri[0] = 100;
+    LEDHSB(0, hue[0], SAT, bri[0]);
+    noInterrupts();
+    Sensor1Detected = false;
+    interrupts();
   }
-  if (digitalRead(SENSOR2) == LOW) {
-    delay(DEBOUNCE);
-    if (digitalRead(SENSOR2) == LOW) {
-      // CAN通信でセンサ感知を通知
-      CAN_DATA[0] = BALLSEP_SENSE;
-      CAN_DATA[1] = 0x02;
-      CAN0.sendMsgBuf(MYID + 0x100, 0, 2, CAN_DATA);
-      // LEDの制御（乱数で色を変えて，輝度を最大にする）
-      hue[1] = random(360);
-      bri[1] = 100;
-      LEDHSB(1, hue[1], SAT, bri[1]);
-      while (digitalRead(SENSOR2) == LOW) {
-        // wait for release SENSOR2
-      }
-    }
+  if (Sensor2Detected) {
+    CAN_DATA[0] = BALLSEP_SENSE;
+    CAN_DATA[1] = 0x02;
+    CAN0.sendMsgBuf(MYID + 0x100, 0, 2, CAN_DATA);
+    hue[1] = random(360);
+    bri[1] = 100;
+    LEDHSB(1, hue[1], SAT, bri[1]);
+    noInterrupts();
+    Sensor2Detected = false;
+    interrupts();
   }
-  if (digitalRead(SENSOR3) == LOW) {
-    delay(DEBOUNCE);
-    if (digitalRead(SENSOR3) == LOW) {
-      // CAN通信でセンサ感知を通知
-      CAN_DATA[0] = BALLSEP_SENSE;
-      CAN_DATA[1] = 0x04;
-      CAN0.sendMsgBuf(MYID + 0x100, 0, 2, CAN_DATA);
-      // LEDの制御（乱数で色を変えて，輝度を最大にする）
-      hue[2] = random(360);
-      bri[2] = 100;
-      LEDHSB(2, hue[2], SAT, bri[2]);
-      while (digitalRead(SENSOR3) == LOW) {
-        // wait for release SENSOR3
-      }
-    }
+  if (Sensor3Detected) {
+    CAN_DATA[0] = BALLSEP_SENSE;
+    CAN_DATA[1] = 0x04;
+    CAN0.sendMsgBuf(MYID + 0x100, 0, 2, CAN_DATA);
+    hue[2] = random(360);
+    bri[2] = 100;
+    LEDHSB(2, hue[2], SAT, bri[2]);
+    noInterrupts();
+    Sensor3Detected = false;
+    interrupts();
   }
 
   // LEDの明るさを変える

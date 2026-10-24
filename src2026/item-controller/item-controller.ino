@@ -8,9 +8,8 @@
 
 // ----------------------------------------------------------------------
 // 書き込み対象のアイテムだけコメントを外す
-//#define BALLSEP
-//#define BALLTHRU
-#define BUMPER
+#define BALLSEP
+//#define BUMPER
 //#define JUMPER
 //#define STARGET
 //#define DTARGET
@@ -198,6 +197,12 @@ void setup() {
     pinMode(SENSOR2, INPUT_PULLUP);
     pinMode(SENSOR3, INPUT_PULLUP);
   #endif
+  #ifdef BALLSEP
+    PORTA.INTFLAGS = PIN5_bm | PIN6_bm | PIN7_bm;
+    PORTA.PIN5CTRL = (PORTA.PIN5CTRL & ~PORT_ISC_gm) | PORT_ISC_FALLING_gc;
+    PORTA.PIN6CTRL = (PORTA.PIN6CTRL & ~PORT_ISC_gm) | PORT_ISC_FALLING_gc;
+    PORTA.PIN7CTRL = (PORTA.PIN7CTRL & ~PORT_ISC_gm) | PORT_ISC_FALLING_gc;
+  #endif
   #if defined(BUMPER) || defined(JUMPER) || defined(SLING)
     pinMode(SOL1, OUTPUT);
   #endif
@@ -250,16 +255,13 @@ void setup() {
   #if defined(BALLSEP)
     MYID = BALLSEP_TX;
   #endif
-  #if defined(BALLTHRU)
-    MYID = BALLTHRU_TX;
-  #endif
   #ifdef SCOREBOARD
     MYID = SCOREBOARD_TX;
   #endif
   #ifdef FLIPPER
     MYID = FLIPPER0_TX;
   #endif
-  #if defined(DTARGET) || defined(BUMPER) || defined(SLING) || defined(FLIPPER) || defined(BALLSEP) || defined(BALLTHRU)
+  #if defined(DTARGET) || defined(BUMPER) || defined(SLING) || defined(FLIPPER) || defined(BALLSEP)
     Serial.print("H L: ");
     Serial.print(analogRead(DIPH));
     Serial.print(" ");
