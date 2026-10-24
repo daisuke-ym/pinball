@@ -126,6 +126,8 @@ void setup() {
   //CAN0.watchFor(0x100, 0xF00); //setup a special filter
   CAN0.watchFor(); //then let everything else through anyway
   //CAN0.setCallback(0, gotHundred); //callback on that first special filter
+
+  initBoard();
 }
 
 // ----------------------------------------------------------------------
@@ -157,22 +159,27 @@ void initBoard() {
 
   // debug
   Serial.println("Initializing board...");
+  // BGM停止
+  MP3B.stop();
   // 得点板クリア
   message.id = SCOREBOARD_TX;
   message.length = 1;
   message.data.byte[0] = SCOREBOARD_CLEAR;
   CAN0.sendFrame(message);
+  delay(100);
+  // ステージ番号送信
+  message.id = TIMER7SEG_TX;
+  message.length = 2;
+  message.data.byte[0] = TIMER_STAGE_NUM;
+  message.data.byte[1] = 0;
+  CAN0.sendFrame(message);
+  /* タイマーボードの動作が不安定なので、カウントダウン動作はしない
   // タイマー停止
   message.id = TIMER7SEG_TX;
   message.length = 1;
   message.data.byte[0] = TIMER_STOP;
   CAN0.sendFrame(message);
-  // ステージ番号送信
-  message.id = TIMER7SEG_TX;
-  message.length = 2;
-  message.data.byte[0] = TIMER_STAGE_NUM;
-  message.data.byte[1] = STAGE + 1;
-  CAN0.sendFrame(message);
+  */
   // 全部のドロップターゲットを上げる
   liftAllDtarget();
 }
@@ -209,6 +216,8 @@ void gameLogic(unsigned long id, byte len, unsigned char* buf) {
   static uint8_t isStartTimer = 0; // ステージタイマー起動フラグ  0:停止中  1:起動中
   static unsigned long DTStageTimer = 0; // 最初のドロップターゲット当たりから始まるタイマー
   static uint8_t LastDTargetState = 0, DTargetState = 0;
+  static unsigned long liftTargetTime = 0; // ドロップターゲットを上げるタイマー
+  static uint8_t liftTargetFlag = 0;
   
   // ---------- 各アイテムの処理 ----------
   switch (id) {
@@ -220,25 +229,25 @@ void gameLogic(unsigned long id, byte len, unsigned char* buf) {
             // エクストラボールが落ちてきた時もこのコマンドが送られてくるので何もしない
             break;
           }
+          Serial.println("### Game started!");
           isPlaying = 1;
           STAGE = 0;
           initBoard();
           // BGM再生
           MP3B.loop(STAGE + 1);
-          Serial.println("### Game started!");
+          // ステージ番号送信
+          message.id = TIMER7SEG_TX;
+          message.length = 2;
+          message.data.byte[0] = TIMER_STAGE_NUM;
+          message.data.byte[1] = STAGE + 1;
+          CAN0.sendFrame(message);
           break;
         case OUTHOLE_DROP_BALL:
+          Serial.println("### Game over!");
           isPlaying = 0;
           STAGE = 0;
           MP3J.play(JINGLE_OUTHOLE);
-          // タイマー停止
-          message.id = TIMER7SEG_TX;
-          message.length = 1;
-          message.data.byte[0] = TIMER_STOP;
-          CAN0.sendFrame(message);
-          // BGM停止
-          MP3B.stop();
-          Serial.println("### Game over!");
+          initBoard();
           break;
         case OUTHOLE_DROP_EXTRABALL:
           Serial.println("### Drop extraball (-> normal game)");
@@ -374,6 +383,7 @@ void gameLogic(unsigned long id, byte len, unsigned char* buf) {
         MP3J.play(JINGLE_DTARGET);
       }
       break;
+    /*
     // ----- タイマー -----
     case TIMER7SEG_RX:
       switch (buf[0]) {
@@ -387,8 +397,10 @@ void gameLogic(unsigned long id, byte len, unsigned char* buf) {
           break;
       }
       break;
+    */
   }
 
+  /* タイマーボードの動作が不安定なので、カウントダウン動作はしない
   // ---------- タイマー開始条件 ----------
   if ((DTargetState != LastDTargetState) && (DTargetState == 0x01 || DTargetState == 0x02 || DTargetState == 0x04)) {
     isStartTimer = 1;
@@ -403,6 +415,7 @@ void gameLogic(unsigned long id, byte len, unsigned char* buf) {
     Serial.print(message.data.byte[1]);
     Serial.println();
   }
+  */
   LastDTargetState = DTargetState;
 
   // ---------- ステージ遷移 ----------
@@ -411,6 +424,7 @@ void gameLogic(unsigned long id, byte len, unsigned char* buf) {
     if (STAGE > NUM_STAGES) {
       STAGE = NUM_STAGES;
     }
+    /*
     // タイマー停止
     isStartTimer = 0;
     message.id = TIMER7SEG_TX;
@@ -420,6 +434,7 @@ void gameLogic(unsigned long id, byte len, unsigned char* buf) {
     // debug
     Serial.print("###  Stop timer");
     Serial.println();
+    */
     // BGM再生
     MP3B.loop(STAGE + 1);
     // ステージ番号送信
@@ -433,9 +448,7 @@ void gameLogic(unsigned long id, byte len, unsigned char* buf) {
     Serial.print(STAGE + 1);
     Serial.println();
     // 全部のターゲットを上げる
-    delay(2000); // ターゲットを上げるまでのディレイ
     liftAllDtarget();
-    DTargetState = 0;
     // フラグクリア
     DTargetState = 0;
     LastDTargetState = 0;
