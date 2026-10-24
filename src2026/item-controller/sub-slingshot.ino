@@ -8,7 +8,7 @@ void loopSlingShot() {
   static int ss = step; // 明度の変化度
   static unsigned long led_update = 0;
   const unsigned long led_update_period = 50;
-  const unsigned long oneshot = 15;
+  const unsigned long oneshot = 35;
   const unsigned long deadtime = 500;
 
   if (digitalRead(SENSOR1) == LOW) {
