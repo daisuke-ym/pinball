@@ -10,7 +10,7 @@
 // 書き込み対象のアイテムだけコメントを外す
 //#define BALLSEP
 //#define BALLTHRU
-//#define BUMPER
+#define BUMPER
 //#define JUMPER
 //#define STARGET
 //#define DTARGET
@@ -159,6 +159,11 @@ const byte SC_DIGITS[] = {
 const int DEBOUNCE = 50; // チャタリング無視時間(ms)
 const int TARGET_DEBOUNCE = 2; // フォトインタラプタを使ったセンサー用のチャタリング無視時間(ms)
 const int DEADTIME = 300; // 一度センサが検知してから，次に検知するまでの無効時間(ms)
+
+// ----------------------------------------------------------------------
+// バンパー用グローバル変数
+const unsigned long BUMPER_ONESHOT = 35; // バンパーのワンショット時間(ms)
+unsigned long BUMPER_DEADTIME = 300; // バンパーのデッドタイム(ms)
 
 // ----------------------------------------------------------------------
 // 得点板用グローバル変数
@@ -324,6 +329,17 @@ void setup() {
     SV.write(SV_CENTER);
   #endif
   
+  // バンパー
+  #ifdef BUMPER
+    // 上バンパーだけデッドタイムを長めにする
+    if (MYID == BUMPER3_TX) {
+      BUMPER_DEADTIME = BUMPER_ONESHOT * 25;
+    }
+    else {
+      BUMPER_DEADTIME = BUMPER_ONESHOT * 10;
+    }
+  #endif
+
   delay(100);
 }
 

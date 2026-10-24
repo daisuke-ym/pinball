@@ -22,10 +22,10 @@ void loopBumper() {
       LEDHSB(0, hue, SAT, bri);
       // ソレノイド動作
       digitalWrite(SOL1, HIGH);
-      delay(10);
+      delay(BUMPER_ONESHOT);
       digitalWrite(SOL1, LOW);
       // デッドタイム
-      delay(DEADTIME);
+      delay(BUMPER_DEADTIME);
     }
   }
 
